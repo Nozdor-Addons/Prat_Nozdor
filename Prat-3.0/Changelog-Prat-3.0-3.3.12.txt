@@ -1,0 +1,109 @@
+------------------------------------------------------------------------
+r463 | sylvanaar | 2010-05-24 03:31:59 +0000 (Mon, 24 May 2010) | 1 line
+Changed paths:
+   A /tags/3.3.12 (from /trunk:462)
+
+Tagging as 3.3.12. PTR changes mostly
+------------------------------------------------------------------------
+r462 | sylvanaar | 2010-05-22 11:45:55 +0000 (Sat, 22 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/Bubbles.lua
+
+make sure to use the correct localization namespace
+------------------------------------------------------------------------
+r461 | sylvanaar | 2010-05-22 11:37:44 +0000 (Sat, 22 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/Bubbles.lua
+
+touch for localizations correction
+------------------------------------------------------------------------
+r460 | sylvanaar | 2010-05-22 09:36:44 +0000 (Sat, 22 May 2010) | 1 line
+Changed paths:
+   A /trunk/modules/Bubbles.lua
+   M /trunk/modules/highcpu.xml
+
+adding new bubbles module. atm it has just the one feature (bubble text limiting) and no options.
+------------------------------------------------------------------------
+r459 | sylvanaar | 2010-05-22 09:17:28 +0000 (Sat, 22 May 2010) | 1 line
+Changed paths:
+   M /trunk/pullouts/Prat-3.0_Experimental/Experimental.lua
+
+first useful feature. limit the length of the chatbubble text and dont allow it to wrap, instead add "..." where the text would normally have wrapped
+------------------------------------------------------------------------
+r458 | sylvanaar | 2010-05-22 08:59:17 +0000 (Sat, 22 May 2010) | 1 line
+Changed paths:
+   M /trunk/pullouts/Prat-3.0_Experimental/Experimental.lua
+
+code needed for the chatbubbles module
+------------------------------------------------------------------------
+r457 | sylvanaar | 2010-05-21 04:12:15 +0000 (Fri, 21 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/ChatFrames.lua
+
+make the zeroing of the chatframe inset happen without a reloadui. currently blizz resets the inset in onload, so a workaround will be needed to save positioning
+------------------------------------------------------------------------
+r456 | sylvanaar | 2010-05-21 04:03:52 +0000 (Fri, 21 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/ChatFrames.lua
+
+add option to eliminate the blank space between the chatframes and the screen edge. on by default. 
+------------------------------------------------------------------------
+r455 | sylvanaar | 2010-05-20 23:37:50 +0000 (Thu, 20 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/OriginalButtons.lua
+
+fix error on live refering to frame from the ptr
+------------------------------------------------------------------------
+r454 | sylvanaar | 2010-05-20 23:11:22 +0000 (Thu, 20 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/History.lua
+   M /trunk/modules/OriginalButtons.lua
+
+fixup the old button module, to sorta work. remove editbox reference from hist
+------------------------------------------------------------------------
+r453 | sylvanaar | 2010-05-20 21:50:38 +0000 (Thu, 20 May 2010) | 1 line
+Changed paths:
+   M /trunk/addon/addon.lua
+   M /trunk/modules/OriginalEditbox.lua
+
+commit changes hg-subversion skipped =(
+------------------------------------------------------------------------
+r452 | sylvanaar | 2010-05-20 21:47:15 +0000 (Thu, 20 May 2010) | 1 line
+Changed paths:
+   M /trunk/addon/addon.lua
+   M /trunk/modules/Buttons.lua
+   M /trunk/modules/Editbox.lua
+   M /trunk/modules/TellTarget.lua
+
+conditionally remove modules which cause errors on the ptr
+------------------------------------------------------------------------
+r450 | sylvanaar | 2010-05-08 23:07:45 +0000 (Sat, 08 May 2010) | 1 line
+Changed paths:
+   M /trunk/Prat-3.0.toc
+
+new faction
+------------------------------------------------------------------------
+r449 | sylvanaar | 2010-05-08 22:11:31 +0000 (Sat, 08 May 2010) | 1 line
+Changed paths:
+   M /trunk/Prat-3.0.toc
+
+my new server
+------------------------------------------------------------------------
+r448 | sylvanaar | 2010-05-08 20:23:16 +0000 (Sat, 08 May 2010) | 1 line
+Changed paths:
+   M /trunk/modules/ServerNames.lua
+
+fix for the server name shortening in non-english realms
+------------------------------------------------------------------------
+r447 | sylvanaar | 2010-04-30 00:51:38 +0000 (Fri, 30 Apr 2010) | 1 line
+Changed paths:
+   M /trunk/modules/Editbox.lua
+
+fix a probable bug with the editbox font
+------------------------------------------------------------------------
+r445 | sylvanaar | 2010-04-12 02:01:27 +0000 (Mon, 12 Apr 2010) | 1 line
+Changed paths:
+   M /trunk/services/chatsections.lua
+
+add "NOT_IN_LFG" to the special case channel notices
+------------------------------------------------------------------------
