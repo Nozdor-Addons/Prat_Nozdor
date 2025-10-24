@@ -92,7 +92,7 @@ Version = "Prat |cff8080ff3.0|r (|cff8080ff".."DEBUG".."|r)"
 --@end-debug@]===]
 
 --@non-debug@
-Version = "Prat |cff8080ff3.0|r (|cff8080ff".."3.3.12".."|r)"
+Version = "Prat |cff8080ff3.0|r (|cff8080ff".."3.3.26".."|r)"
 --@end-non-debug@
 
 
@@ -120,7 +120,8 @@ local L = Localizations
 
 Frames = {
     ["ChatFrame1"]=_G.ChatFrame1, ["ChatFrame2"]=_G.ChatFrame2, ["ChatFrame3"]=_G.ChatFrame3,
-    ["ChatFrame4"]=_G.ChatFrame4, ["ChatFrame5"]=_G.ChatFrame5, ["ChatFrame6"]=_G.ChatFrame6, ["ChatFrame7"]=_G.ChatFrame7
+    ["ChatFrame4"]=_G.ChatFrame4, ["ChatFrame5"]=_G.ChatFrame5, ["ChatFrame6"]=_G.ChatFrame6, ["ChatFrame7"]=_G.ChatFrame7,
+    ["ChatFrame8"]=_G.ChatFrame8, ["ChatFrame9"]=_G.ChatFrame9, ["ChatFrame10"]=_G.ChatFrame10
 }
 HookedFrames = {
 }
@@ -373,6 +374,16 @@ do
 --Prat 3.0 (244): 1, "General - The Storm Peaks", 0
 end
 
+function addon:FCF_SetTemporaryWindowType(chatFrame, chatType, chatTarget)
+    local name = chatFrame:GetName()
+
+    Frames[name] = chatFrame
+    
+    if not HookedFrames[name] then 
+        self:RawHook(chatFrame, "AddMessage", true)
+        HookedFrames[name] = chatFrame
+    end
+end
 
 function addon:PostEnable()
 --[===[@debug@ 
@@ -396,6 +407,9 @@ function addon:PostEnable()
 
     -- ItemRef Hooking
 	self:RawHook("SetItemRef", true)
+	
+	
+	self:SecureHook("FCF_SetTemporaryWindowType")
 
 --    -- This event fires after Prat's hooks are installed
 --    -- Prat's core wont operate until after this event
@@ -430,6 +444,7 @@ function addon:PostEnable()
 	end
 
 	if MemoryUse then 
+	    _G.collectgarbage("collect")
 		self:Print("Memory Use: "..MemoryUse())
 	end
 --@end-debug@]===]
@@ -506,12 +521,13 @@ end
 
 
 function addon:ChatFrame_MessageEventHandler(this, event, ...)
---function addon:ChatFrame_MessageEventHandler(event, ...)
     local PRE_ADDMESSAGE = "Prat_PreAddMessage"
     local POST_ADDMESSAGE = "Prat_PostAddMessage"
     local FRAME_MESSAGE = "Prat_FrameMessage"
 
-	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = ... 
+	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ... 
+
+    loading = nil -- clear any batch message loading that may be happening
 
     if not HookedFrames[this:GetName()] then
 		return self.hooks["ChatFrame_MessageEventHandler"](this, event, ...)
@@ -528,7 +544,7 @@ function addon:ChatFrame_MessageEventHandler(this, event, ...)
 
 	-- Create a message table. This table contains the chat message in a non-concatenated form
     -- so that it can be modified easily without lots of complex gsub's
-    message, info = SplitChatMessage(this, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+    message, info = SplitChatMessage(this, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13)
 
 	-- Handle Default-UI filtering: Since the default UI now provides filtering functions 
 	-- similar to the way Prat's pattern registry works, we need to be sure not to call the 
@@ -539,7 +555,7 @@ function addon:ChatFrame_MessageEventHandler(this, event, ...)
 		return true	
 	end
 
-    if not info then
+    if not info or not EventIsProcessed(event) then
     	return self.hooks["ChatFrame_MessageEventHandler"](this, event, ...)
     else
         local m = SplitMessage
@@ -597,7 +613,7 @@ function addon:ChatFrame_MessageEventHandler(this, event, ...)
 
             -- Allow for message blocking during the patern match phase
             if not m.DONOTPROCESS and m.OUTPUT:len()>0 then 
-				this:AddMessage(m.OUTPUT, r,g,b,id);
+				this:AddMessage(m.OUTPUT, r,g,b,id, false, m.ACCESSID, m.TYPEID);
             
             
             -- We have called addmessage by now, or we have skipped it

@@ -119,18 +119,18 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- ["Change the color of the URL."] = "",
-	-- ["Color URL"] = "",
-	-- ["Set Color"] = "",
-	-- ["Show Brackets"] = "",
-	-- Toggle = "",
-	-- ["Toggle showing brackets on and off."] = "",
-	-- ["Toggle the module on and off."] = "",
-	-- ["Toggle the URL color on and off."] = "",
-	-- UrlCopy = "",
+	["Change the color of the URL."] = "URL의 색상 변경.",
+	["Color URL"] = "URL 색상",
+	["Set Color"] = "색상 설정",
+	["Show Brackets"] = "괄호 보이기",
+	Toggle = "토글",
+	["Toggle showing brackets on and off."] = "괄호 보이거나 숨김.",
+	["Toggle the module on and off."] = "모듈 사용 또는 끄기.",
+	["Toggle the URL color on and off."] = "URL 색상 켜거나 끔.",
+	UrlCopy = "Url복사",
 	-- ["URL formating options."] = "",
-	-- ["Use Popup"] = "",
-	-- ["Use popup window to show URL."] = "",
+	["Use Popup"] = "팝업창 사용",
+	["Use popup window to show URL."] = "URL을 보기 위해 팝업창을 사용합니다.",
 }
 
 )
@@ -700,10 +700,10 @@ end
 
 
 function module:EditBoxUrl(link)
-    if (not ChatFrameEditBox:IsShown()) then
+    if (not ChatEdit_GetActiveWindow():IsShown()) then
         ChatFrame_OpenChat(link, DEFAULT_CHAT_FRAME)
     else
-        ChatFrameEditBox:Insert(link)
+        ChatEdit_GetActiveWindow():Insert(link)
     end
 end
 

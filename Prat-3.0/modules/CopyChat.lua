@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -94,11 +94,11 @@ L:AddLocale("enUS",
 )
 L:AddLocale("frFR",  
 {
-	-- BBCode = "",
+	BBCode = true,
 	-- ChatFrame = "",
 	["Copy all of the text in the selected chat frame into an edit box"] = "Copier tout le texte de la fenêtre de chat dans l'invite de discussion.",
 	CopyChat = "CopierLeChat",
-	-- ["Copy Text"] = "",
+	["Copy Text"] = "Copier le Texte",
 	-- ["Copy Text Format"] = "",
 	["Copy text from the active chat window."] = "Copier le texte à partir de la fenêtre de chat active.",
 	HTML = true,
@@ -107,7 +107,7 @@ L:AddLocale("frFR",
 	-- ["Should the copied text be plain, or formatted so you can see the colors."] = "",
 	-- showbutton_desc = "",
 	showbutton_name = "Bouton de copie",
-	-- [" Text"] = "",
+	[" Text"] = "Texte",
 	-- ["Wowace.com Forums"] = "",
 }
 
@@ -135,20 +135,20 @@ L:AddLocale("deDE",
 L:AddLocale("koKR",  
 {
 	-- BBCode = "",
-	-- ChatFrame = "",
-	-- ["Copy all of the text in the selected chat frame into an edit box"] = "",
-	-- CopyChat = "",
-	-- ["Copy Text"] = "",
-	-- ["Copy Text Format"] = "",
-	-- ["Copy text from the active chat window."] = "",
-	-- HTML = "",
-	-- ["Message From : %s"] = "",
-	-- Plain = "",
+	ChatFrame = "채팅창",
+	["Copy all of the text in the selected chat frame into an edit box"] = "선택된 채팅창의 모든 내용을 대화 입력창으로 복사합니다",
+	CopyChat = "대화 복사",
+	["Copy Text"] = "텍스트 복사",
+	["Copy Text Format"] = "복사 내용 서식",
+	["Copy text from the active chat window."] = "활성화 된 채팅창에서 내용 복사.",
+	HTML = true,
+	["Message From : %s"] = "%s 로부터 귓말",
+	Plain = "보통",
 	-- ["Should the copied text be plain, or formatted so you can see the colors."] = "",
-	-- showbutton_desc = "",
-	-- showbutton_name = "",
-	-- [" Text"] = "",
-	-- ["Wowace.com Forums"] = "",
+	showbutton_desc = "채팅창에 버튼 보이기",
+	showbutton_name = "복사 버튼",
+	[" Text"] = "텍스트",
+	["Wowace.com Forums"] = "wowace.com 포럼",
 }
 
 )
@@ -318,14 +318,25 @@ function module:OnModuleEnable()
         self:showbutton(k, self.db.profile.showbutton[k])
     end
     UnitPopupButtons["COPYCHAT"]    = { text =L["Copy Text"], dist = 0 , func = function(a1, a2) module:CopyLineFromPlayerlink(a1, a2) end , arg1 = "", arg2 = ""};
-    tinsert(UnitPopupMenus["FRIEND"],#UnitPopupMenus["FRIEND"]-1,"COPYCHAT");    
-
+    
+    if not self.menusAdded then
+        tinsert(UnitPopupMenus["FRIEND"],#UnitPopupMenus["FRIEND"]-1,"COPYCHAT");    
+        self.menusAdded = true
+    end
+    
     Prat:RegisterDropdownButton("COPYCHAT", function(menu, button) button.arg1 = module.clickedFrame end )
 
 
     self:SecureHook("ChatFrame_OnHyperlinkShow")
+    self:SecureHook("FCF_SetTemporaryWindowType")
 end
     
+function module:FCF_SetTemporaryWindowType(chatFrame, ...)
+    local id = chatFrame:GetID()
+    self.buttons[id] = self:MakeReminder(id)
+    self:showbutton(id, self.db.profile.showbutton[1])
+end
+
 function module:ChatFrame_OnHyperlinkShow(this, ...)
     self.clickedframe = this
 end

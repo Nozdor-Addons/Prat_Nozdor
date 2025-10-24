@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -111,29 +111,29 @@ L:AddLocale("enUS",
 )
 L:AddLocale("frFR",  
 {
-	-- ["Auto Restore Font Size"] = "",
-	-- ["Chat window font options."] = "",
-	-- Font = "",
-	-- monochrome_desc = "",
-	-- monochrome_name = "",
+	["Auto Restore Font Size"] = "Restauration automatique de la taille du texte",
+	["Chat window font options."] = "Options de formattage du texte",
+	Font = "Police",
+	monochrome_desc = "Activer/Désactiver la monochromie de la police",
+	monochrome_name = "Activer/Désactiver la monochromie",
 	None = "Rien",
-	-- Outline = "",
+	Outline = "Surlignage",
 	-- outlinemode_desc = "",
 	-- outlinemode_name = "",
 	-- rememberfont_desc = "",
 	-- rememberfont_name = "",
-	-- ["Set ChatFrame%d Font Size"] = "",
-	-- ["Set Font Face"] = "",
+	["Set ChatFrame%d Font Size"] = "Définir la taille de la police de la fenêtre de chat %d",
+	["Set Font Face"] = "Configurer la police du texte",
 	["Set Font Size"] = "Définir la taille de la police",
-	-- ["Set Separately"] = "",
-	-- ["Set text font size."] = "",
-	-- ["Set text font size for each chat window."] = "",
+	["Set Separately"] = "Configurer séparément",
+	["Set text font size."] = "Définir la taille du texte.",
+	["Set text font size for each chat window."] = "Définir la taille du texte de chaque fenêtre.",
 	-- ["Set the text font face for all chat windows."] = "",
 	-- shadowcolor_desc = "",
-	-- shadowcolor_name = "",
-	-- ["Thick Outline"] = "",
-	-- ["Toggle setting options separately for each chat window."] = "",
-	-- ["Workaround a Blizzard bug which changes the font size when you open a system menu."] = "",
+	shadowcolor_name = "Définit la couleur de l'ombre",
+	["Thick Outline"] = "Epaisseur du surlignage",
+	["Toggle setting options separately for each chat window."] = "Activer/Désactiver les options séparées pour chaque fenêtre.",
+	["Workaround a Blizzard bug which changes the font size when you open a system menu."] = "Contourner un bug de Blizzard qui change la taille de la police quand on ouvre un menu système.",
 }
 
 )
@@ -335,7 +335,7 @@ L:AddLocale("zhTW",
 )
 --@end-non-debug@
 
-local module = Prat:NewModule(PRAT_MODULE, "AceHook-3.0")
+local module = Prat:NewModule(PRAT_MODULE, "AceHook-3.0", "AceEvent-3.0")
 
 Prat:SetModuleDefaults(module, {
 	profile = {
@@ -511,6 +511,8 @@ Prat:SetModuleOptions(module, {
 ------------------------------------------------]]--
 
 function module:OnModuleEnable()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+
     self.oldsize = {}
 
     for k, cf in pairs(Prat.Frames) do
@@ -527,6 +529,11 @@ function module:OnModuleEnable()
 --    -- the size resets to 12 when closing UIOptionsFrame.
 --    self:SetAutoRestore(self.db.profile.autorestore)
     self:SecureHook("FCF_SetChatWindowFontSize")
+end
+
+function module:PLAYER_ENTERING_WORLD()
+	self:ConfigureAllChatFrames()
+	self:UnregisterAllEvents()
 end
 
 function module:OnModuleDisable()
@@ -553,8 +560,8 @@ end
 function module:ConfigureAllChatFrames()
 	local db = self.db.profile
 
-    if self.db.profile.fontface then
-        self:SetFont(self.db.profile.fontface)
+    if db.fontface then
+        self:SetFont(db.fontface)
     end
 
 

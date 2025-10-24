@@ -23,7 +23,7 @@ local string = string
 local strsub = string.sub 
 local strsplit = strsplit
 local tonumber, tostring = tonumber, tostring
-local strlower = strlower
+local strlower, strupper = strlower, strupper
 local strlen = strlen
 local type = type
 local next, wipe = next, wipe
@@ -286,7 +286,7 @@ end
 local function safestr(s) return s or "" end
 
 function SplitChatMessage(frame, event, ...)
-	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = ...
+	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...
 
 	ClearChatSections(SplitMessageOrg)
 	ClearChatSections(SplitMessage)
@@ -296,6 +296,11 @@ function SplitChatMessage(frame, event, ...)
         local info = _G.ChatTypeInfo[type]
 
         local s = SplitMessageOrg
+
+        -- blizzard bug, arg2 (player name) can have an extra space
+        if arg2 then
+            arg2=arg2:trim()
+        end
 
 	    s.GUID = arg12
 
@@ -336,8 +341,39 @@ function SplitChatMessage(frame, event, ...)
 
         s.CHATTYPE = type
         s.EVENT = event
+        local chatGroup = _G.Chat_GetChatCategory(type)
+        s.CHATGROUP = chatGroup
+        
+        
+        
+      	local chatTarget;
+		if ( chatGroup == "CHANNEL" or chatGroup == "BN_CONVERSATION" ) then
+			chatTarget = tostring(arg8);
+		elseif ( chatGroup == "WHISPER" or chatGroup == "BN_WHISPER" ) then
+			chatTarget = strupper(arg2);
+		end
 
+        s.CHATTARGET = chatTarget
         s.MESSAGE = safestr(arg1)
+     
+     
+     	if ( _G.FCFManager_ShouldSuppressMessage(frame, s.CHATGROUP, s.CHATTARGET) ) then
+			s.DONOTPROCESS = true
+		end
+     
+		if ( chatGroup == "WHISPER" or chatGroup == "BN_WHISPER" ) then
+			if ( frame.privateMessageList and not frame.privateMessageList[strlower(arg2)] ) then
+				s.DONOTPROCESS = true
+			elseif ( frame.excludePrivateMessageList and frame.excludePrivateMessageList[strlower(arg2)] ) then
+				s.DONOTPROCESS = true
+			end
+		elseif ( chatGroup == "BN_CONVERSATION" ) then
+			if ( frame.bnConversationList and not frame.bnConversationList[arg8] ) then
+				s.DONOTPROCESS = true
+			elseif ( frame.excludeBNConversationList and frame.excludeBNConversationList[arg8] ) then
+				s.DONOTPROCESS = true
+			end
+		end     
      
 
         local chatget = _G["CHAT_"..type.."_GET"]
@@ -374,7 +410,9 @@ function SplitChatMessage(frame, event, ...)
 
                 s.pP = "["
                 s.lL = "|Hplayer:"
+                
                 s.PLAYERLINK = arg2
+                
                 s.LL = "|h"
                 s.PLAYER = plr
 
@@ -383,9 +421,13 @@ function SplitChatMessage(frame, event, ...)
                     s.SERVER = svr
                 end
 
-                if arg11 then
-                    s.PLAYERLINKDATA = ":"..safestr(arg11)
-                end
+
+            	if ( type ~= "BN_WHISPER" and type ~= "BN_WHISPER_INFORM" and type ~= "BN_CONVERSATION") or arg2 == _G.UnitName("player") then
+    				s.PLAYERLINKDATA = ":"..safestr(arg11)..":"..chatGroup..(chatTarget and ":"..chatTarget or "")
+    			else
+    			    s.lL = "|HBNplayer:"
+    				s.PLAYERLINKDATA = ":"..safestr(arg13)..":"..safestr(arg11)..":"..chatGroup..(chatTarget and ":"..chatTarget or "")
+    			end
 
                 s.Ll = "|h"
                 s.Pp = "]"
@@ -445,7 +487,7 @@ function SplitChatMessage(frame, event, ...)
         end
 
         local arg9 = safestr(arg9)
-        if strlen(arg9) > 0 then
+        if strlen(arg9) > 0 or chatGroup == "BN_CONVERSATION" then
 --            local bracket, post_bracket = string.match(s.TYPEPREFIX, "%[(.*)%](.*)")
 --            bracket = safestr(bracket)
 --            if strlen(bracket) > 0 then
@@ -458,16 +500,27 @@ function SplitChatMessage(frame, event, ...)
 
 
             if strlen(safestr(arg8)) > 0 and arg8 > 0 then
-                s.CHANNELNUM = tostring(arg8)
                 s.CC = ". "
 
     			s.nN = "|H"
     			s.NN = "|h"
     			s.Nn = "|h"
-                s.CHANLINK = "channel:"..tostring(arg8)	
+                
+                
+     			if chatGroup  == "BN_CONVERSATION" then
+     			    s.CHANLINK = "channel:BN_CONVERSATION:"..arg8
+    			else
+                    s.CHANNELNUM = tostring(arg8)
+                    s.CHANLINK = "channel:channel:"..tostring(arg8)	
+    			end                
             end
 
-            if arg7 > 0 then
+            if chatGroup  == "BN_CONVERSATION" then                
+                s.cC = "["
+                s.Cc = "] "
+ 			    s.CHANNELNUM = tostring(_G.MAX_WOW_CHAT_CHANNELS + arg8)
+                s.CHANNEL = _G.CHAT_BN_CONVERSATION_SEND:match("%[%%d%. (.*)%]")
+            elseif arg7 > 0 then
                 s.cC = "["
                 s.Cc = "] "
                 s.CHANNEL, s.zZ, s.ZONE = string.match(arg9, "(.*)(%s%-%s)(.*)")
@@ -544,6 +597,9 @@ function SplitChatMessage(frame, event, ...)
             end
         end
 
+        s.ACCESSID = _G.ChatHistory_GetAccessID(chatGroup, chatTarget);
+        s.TYPEID = _G.ChatHistory_GetAccessID(type, chatTarget);
+        
         s.ORG = SplitMessageOrg
 
         return SplitMessage, info

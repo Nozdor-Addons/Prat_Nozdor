@@ -66,6 +66,9 @@ local eventMap = {
     CHAT_MSG_SYSTEM = true,
     CHAT_MSG_DND = true,
     CHAT_MSG_AFK = true,
+    CHAT_MSG_BN_WHISPER = true,
+    CHAT_MSG_BN_WHISPER_INFORM = true,
+    CHAT_MSG_BN_CONVERSATION = true,
 }
 
 function EnableProcessingForEvent(event, flag)

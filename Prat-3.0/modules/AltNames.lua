@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -269,17 +269,17 @@ L:AddLocale("frFR",
 	-- ["Delete alt"] = "",
 	-- Disabled = "",
 	-- ["Display a player's alts in the tooltip"] = "",
-	-- ["Display a player's main name in the tooltip"] = "",
+	["Display a player's main name in the tooltip"] = "Affiche le nom principale d'un joueur dans la tooltip",
 	-- ["Display main names in the same colour as that of the alt's class (taking the data from the PlayerNames module if it is enabled)"] = "",
 	-- ["Display main names in the same colour as that of the main's class (taking the data from the PlayerNames module if it is enabled)"] = "",
-	-- ["Don't overwrite existing alt <-> main links when importing or adding new alts."] = "",
-	-- ["Don't overwrite existing links"] = "",
+	["Don't overwrite existing alt <-> main links when importing or adding new alts."] = "Ne pas écraser les liens principal <-> Alternatif lors d'un import ou d'un ajout de nouveaux personnages Alternatifs",
+	["Don't overwrite existing links"] = "Ne pas écraser les liens existant",
 	-- ["don't use"] = "",
-	-- ["Don't use data from the PlayerNames module at all"] = "",
-	-- ["ERROR: some function sent a blank message!"] = "",
-	-- ["Find characters"] = "",
-	-- ["Fix alts"] = "",
-	-- ["Fix corrupted entries in your list of alt names."] = "",
+	["Don't use data from the PlayerNames module at all"] = "Ne pas utiliser les donnée du module \"PlayerNames\" du tout",
+	["ERROR: some function sent a blank message!"] = "ERREUR: une fonction a envoyé un message blanc !",
+	["Find characters"] = "Trouver des personnages",
+	["Fix alts"] = "Réparer les alternatifs", -- Needs review
+	["Fix corrupted entries in your list of alt names."] = "Réparer les entrées corrompues dans votre liste de noms alternatifs.",
 	-- ["Found alt: %s => main: %s"] = "",
 	-- ["guild member alts found and imported: %s"] = "",
 	-- ["Import from Guild Greet database"] = "",
@@ -454,14 +454,14 @@ L:AddLocale("koKR",
 	-- autoguildalts_name = "",
 	-- ["Be quiet"] = "",
 	-- ["character removed: %s"] = "",
-	-- ["Class colour"] = "",
+	["Class colour"] = "직업 색상",
 	-- ["Clear all"] = "",
 	-- ["Clear all links between alts and main names."] = "",
-	-- Colour = "",
+	Colour = "색상",
 	-- ["%d alts found for %s: %s"] = "",
 	-- ["Delete a character's link to another character as their main."] = "",
 	-- ["Delete alt"] = "",
-	-- Disabled = "",
+	Disabled = "비활성",
 	-- ["Display a player's alts in the tooltip"] = "",
 	-- ["Display a player's main name in the tooltip"] = "",
 	-- ["Display main names in the same colour as that of the alt's class (taking the data from the PlayerNames module if it is enabled)"] = "",
@@ -524,7 +524,7 @@ L:AddLocale("koKR",
 	-- Start = "",
 	-- ["%s total alts linked to mains"] = "",
 	-- ["The colour of an alt's main name that will be displayed"] = "",
-	-- ["Use class colour (from the PlayerNames module)"] = "",
+	["Use class colour (from the PlayerNames module)"] = "직업 색상 사용 (플레이어 이름 모듈)",
 	-- ["use class colour of alt"] = "",
 	-- ["use class colour of main"] = "",
 	-- ["Use LibAlts Data"] = "",
@@ -533,7 +533,7 @@ L:AddLocale("koKR",
 	-- ["warning: alt %s already linked to %s"] = "",
 	-- ["Where to display a character's main name when on their alt."] = "",
 	-- ["Whether to report to the chat frame or not."] = "",
-	-- ["You are not in a guild"] = "",
+	["You are not in a guild"] = "당신은 길드에 속해 있지 않습니다",
 	-- ["You have not yet linked any alts with their mains."] = "",
 }
 
@@ -1094,8 +1094,8 @@ Prat:SetModuleInit(module,
 			end,
 	
 			OnHide = function(this)
-				if ( ChatFrameEditBox:IsShown() ) then
-					ChatFrameEditBox:SetFocus();
+				if ( this.editBox:IsShown() ) then
+					this.editBox:SetFocus();
 				end
 				getglobal(this:GetName().."EditBox"):SetText("");
 			end,
@@ -1420,12 +1420,16 @@ function module:OnModuleEnable()
 	-- add the bits to the context menus
 	UnitPopupButtons['LINK_ALT'] = { text = "Set Main", dist = 0, func = function() module:UnitPopup_LinkAltOnClick() end , arg1 = "", arg2 = ""}
 
-	tinsert(UnitPopupMenus['PARTY'], #UnitPopupMenus['PARTY']-1, 'LINK_ALT')
-	tinsert(UnitPopupMenus['FRIEND'], #UnitPopupMenus['FRIEND']-1, 'LINK_ALT')
-	tinsert(UnitPopupMenus['SELF'], #UnitPopupMenus['SELF']-1, 'LINK_ALT')
-	tinsert(UnitPopupMenus['PLAYER'], #UnitPopupMenus['PLAYER']-1, 'LINK_ALT')
-	-- tinsert(UnitPopupMenus['TARGET'], getn(UnitPopupMenus['TARGET'])-1, 'LINK_ALT')
-	
+    if not self.menusAdded then
+    	tinsert(UnitPopupMenus['PARTY'], #UnitPopupMenus['PARTY']-1, 'LINK_ALT')
+    	tinsert(UnitPopupMenus['FRIEND'], #UnitPopupMenus['FRIEND']-1, 'LINK_ALT')
+    	tinsert(UnitPopupMenus['SELF'], #UnitPopupMenus['SELF']-1, 'LINK_ALT')
+    	tinsert(UnitPopupMenus['PLAYER'], #UnitPopupMenus['PLAYER']-1, 'LINK_ALT')
+    	-- tinsert(UnitPopupMenus['TARGET'], getn(UnitPopupMenus['TARGET'])-1, 'LINK_ALT')
+        
+        self.menusAdded = true
+    end
+    	
 	if self.db.profile.autoguildalts then
     	self:AutoImportGuildAlts(true)
     end

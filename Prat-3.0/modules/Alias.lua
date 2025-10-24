@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -187,7 +187,7 @@ L:AddLocale("frFR",
 	["total aliases: %d"] = "Alias totaux : %d",
 	["tried to show value for alias \"%s\" but undefined in module.Aliases!"] = "A tenté de montrer la valeur de l'alias \"%s\" mais il était indéfini dans le module Alias!",
 	unalias = "Enlever l'alias",
-	verbose = "Prolixe",
+	verbose = "verbeux",
 	["warnUser() called with nil argument!"] = "warnUser() appelé avec un argument nul",
 	["warnUser() called with zero length string!"] = "warnUser() appelé avec un chaine de longueur zéro",
 }
@@ -212,7 +212,7 @@ L:AddLocale("deDE",
 	["<keyword> - finds all aliases matching <keyword> (cmd aliases: /findalias)"] = "<keyword> - Findet alle Alias, die <keyword> (Stichwort) entsprechen (cmd aliases: /findalias)",
 	listaliases = true,
 	["list all aliases"] = "Alle Alias auflisten",
-	[" - list all aliases; supply <keyword> to search for matching aliases (cmd aliases: /listallaliases)"] = "- auflisten aller Alias; eingabe <keyword> um nach passenden Alias zu suchen (cmd aliases: /listallaliases)",
+	[" - list all aliases; supply <keyword> to search for matching aliases (cmd aliases: /listallaliases)"] = "- auflisten aller Alias; <keyword> eingeben, um nach passenden Alias zu suchen (cmd aliases: /listallaliases)",
 	["matching aliases found: %d"] = "Passende Alias gefunden: %d",
 	module_desc = "Fügt das Kommando /alias hinzu, das verwendet werden kann, um \"Slash\"-Befehle durch Alias zu ersetzen, ähnlich wie der Alias-Befehl unter Unix.",
 	module_name = "Alias",
@@ -334,30 +334,30 @@ L:AddLocale("ruRU",
 	["add an alias"] = "добавить псевдоним",
 	["<alias> - remove the alias <alias> (cmd aliases: /delalias, /remalias)"] = "<alias> - удалить все псевдонимы <alias> (cmd псевдонимы: /delalias, /remalias)",
 	["alias \"/%s\" does not exist"] = "псевдонима \"/%s\" не существует",
-	["<command>[ <value>] - alias <command> to be executed as <value>, or return the value of the currently defined alias for <command> if <command> has not been assigned a value. eg: \"/alias /examplehello /say hello there\" - typing \"/examplehello\" will now cause your character to say \"hello there\"; \"/alias examplehello\" - s \"/examplehello is aliased to /say hello there\" (cmd aliases: /addalias)"] = "<command>[ <value> ] - псевдоним <command> будет выполнятся как <value>, или возвращёно значение в настоящее время определенное псевдонимом для <command> если <command> не было присвоено значение. например: \"/alias /examplehello /say Привет\" - набрав \"/examplehello\" теперь ваш персонаж скажет \"Привет\"; \"/alias examplehello\" - s \"/examplehello это псевдоним /say Привет\" (cmd псевдонимы: /addalias)",
+	["<command>[ <value>] - alias <command> to be executed as <value>, or return the value of the currently defined alias for <command> if <command> has not been assigned a value. eg: \"/alias /examplehello /say hello there\" - typing \"/examplehello\" will now cause your character to say \"hello there\"; \"/alias examplehello\" - s \"/examplehello is aliased to /say hello there\" (cmd aliases: /addalias)"] = "<command>[ <value> ] - псевдоним <command> будет выполняться как <value>, или возвращено значение в настоящее время определенное псевдонимом для <command>, если <command> не было присвоено значение. например: \"/alias /examplehello /say Привет\" - набрав \"/examplehello\" теперь ваш персонаж скажет \"Привет\"; \"/alias examplehello\" - s \"/examplehello это псевдоним /say Привет\" (cmd псевдонимы: /addalias)", -- Needs review
 	["dealiasing command /%s to /%s"] = "раскрытие псевдонима /%s в /%s",
 	["deleting alias \"/%s\" (previously aliased as \"/%s\")"] = "удаление псевдонима \"/%s\" (перед этим назывался как \"/%s\")",
 	["Display extra information in the chat frame when commands are dealiased"] = "Отображать дополнительную информацию в рамке чата при раскрытии псевдонимов команд",
 	["Don't overwrite existing aliases when using /addalias"] = "Не перезаписывать существующие псевдонимы при использовани /addalias",
-	["Expand aliases as you are typing"] = "Раскрыть псевдонимы которые вы вводили",
-	-- findaliases = "",
-	["find aliases matching a given search term"] = "найти псевдонимы совпавшие с заданными запросами поиска",
+	["Expand aliases as you are typing"] = "Раскрыть псевдонимы, которые вы вводили", -- Needs review
+	findaliases = "найти псевдонимы", -- Needs review
+	["find aliases matching a given search term"] = "найти псевдонимы, совпавшие с заданной строкой", -- Needs review
 	["infinite loop detected for alias /%s - ignoring"] = "обнаружен бесконечный цикл при раскрытии псевдонима /%s - игнорируется",
 	inline = "на линии",
 	["<keyword> - finds all aliases matching <keyword> (cmd aliases: /findalias)"] = "<keyword> - найти все псевдонимы, совпадающие с <keyword> (команда: /findalias)",
-	-- listaliases = "",
+	listaliases = "вывести список псевдонимов",
 	["list all aliases"] = "список всех псевдонимов",
 	[" - list all aliases; supply <keyword> to search for matching aliases (cmd aliases: /listallaliases)"] = " - список всех псевдонимов; источник <keyword> для поиска псевдонимов (команда: /listallaliases)",
 	["matching aliases found: %d"] = "совпавших псевдонимов найдено: %d",
 	module_desc = "Добовляет команду /alias, which can be used to alias slash commands in a similar way to the Unix alias command.",
 	module_name = "Псевдонимы",
 	["No aliases have been defined"] = "Псевдонимов не обнаружено",
-	-- noclobber = "",
-	-- ["noclobber set - skipping new alias: /%s already expands to /%s"] = "",
+	noclobber = "защита настроек",
+	["noclobber set - skipping new alias: /%s already expands to /%s"] = "защита настроек - пропускаем новый псевдоним:  /%s уже задано как /%s", -- Needs review
 	Options = "Настройки",
-	["Options for altering the behaviour of Alias"] = "Опции для изменения поведения Псевдонимов", -- Needs review
+	["Options for altering the behaviour of Alias"] = "Опции для изменения поведения Псевдонимов",
 	["overwriting existing alias \"/%s\" (was aliased to \"/%s\")"] = "перезапись сужествующего псевдонима \"/%s\" (теперь псевдоним \"/%s\")",
-	-- ["refusing to alias \"/%s\" to anything in the interests of Not Buggering Everything Up"] = "",
+	["refusing to alias \"/%s\" to anything in the interests of Not Buggering Everything Up"] = "отказываемся использовать \"/%s\", чтобы не вызвать Огромную неведомую фигню", -- Needs review
 	["remove an alias"] = "убрать псевдоним",
 	["/%s aliased to \"/%s\""] = "/%s теперь псевдоним на \"/%s\"",
 	["/%s aliased to: /%s"] = "/%s теперь псевдоним: /%s",
@@ -365,9 +365,9 @@ L:AddLocale("ruRU",
 	["%s() called with nil argument!"] = "Функция %s() вызвана с нулевым аргументом!",
 	["There is no alias current defined for \"%s\""] = "Нет псевдонимов для \"%s\"",
 	["total aliases: %d"] = "всего псевдонимов: %d",
-	-- ["tried to show value for alias \"%s\" but undefined in module.Aliases!"] = "",
-	-- unalias = "",
-	-- verbose = "",
+	["tried to show value for alias \"%s\" but undefined in module.Aliases!"] = "\"%s\" не определено в модуле \"Псевдонимы\" при попытке показать значение!", -- Needs review
+	unalias = "удалить псевдоним", -- Needs review
+	verbose = "подробно",
 	["warnUser() called with nil argument!"] = "Функция warnUser() вызвана с нулевым аргументом!",
 	["warnUser() called with zero length string!"] = "Функция warnUser() вызвана со строкой нулевой длины!",
 }
@@ -517,7 +517,7 @@ Prat:SetModuleDefaults(module.name, {
 		on	= false,
 		aliases	= {},
 		verbose	= false,
-		inline	= true,
+		inline	= false,
 		noclobber = false,
 	
 		-- things we won't alias

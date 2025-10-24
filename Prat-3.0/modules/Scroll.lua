@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -57,8 +57,8 @@ L:AddLocale("enUS", {
     ["mousewheel_desc"] = "Toggle mousewheel support for each chat window.",
     ["Set MouseWheel Speed"] = true,
     ["Set number of lines mousewheel will scroll."] = true,
-    ["Set Ctrl+MouseWheel Speed"] = true,
-    ["Set number of lines mousewheel will scroll when ctrl is pressed."] = true,
+    ["Set Ctrl+MouseWheel Speed"] = "Set Shift+MouseWheel Speed",
+    ["Set number of lines mousewheel will scroll when ctrl is pressed."] = "Set number of lines mousewheel will scroll when shift is pressed.",
     ["lowdown_name"] = "Enable TheLowDown",
     ["lowdown_desc"] = "Toggle auto jumping to the bottom for each chat window.",
     ["Set TheLowDown Delay"] = true,
@@ -140,22 +140,22 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- Bottom = "",
-	-- ["Chat window scrolling options."] = "",
+	Bottom = "밑에서 위로",
+	["Chat window scrolling options."] = "채팅창 스크롤 옵션.",
 	-- ["Control whether text is added to the frame at the top or the bottom."] = "",
-	-- lowdown_desc = "",
+	lowdown_desc = "채팅창별 최하단 이동버튼 보이기",
 	-- lowdown_name = "",
-	-- mousewheel_desc = "",
-	-- mousewheel_name = "",
-	-- Scroll = "",
-	-- ["Set Ctrl+MouseWheel Speed"] = "",
-	-- ["Set MouseWheel Speed"] = "",
-	-- ["Set number of lines mousewheel will scroll."] = "",
-	-- ["Set number of lines mousewheel will scroll when ctrl is pressed."] = "",
+	mousewheel_desc = "채팅창별 마우스 휠 지원 토글",
+	mousewheel_name = "마우스 휠 사용",
+	Scroll = "스크롤",
+	["Set Ctrl+MouseWheel Speed"] = "Ctrl+마우스 휠 속도 설정",
+	["Set MouseWheel Speed"] = "마우스 휠 속도 설정",
+	["Set number of lines mousewheel will scroll."] = "마우스 휠로 스크롤할 줄의 수 설정",
+	["Set number of lines mousewheel will scroll when ctrl is pressed."] = "Ctrl 키를 누르고 마우스 휠을 사용할 때 스크롤할 줄의 수 설정",
 	-- ["Set TheLowDown Delay"] = "",
 	-- ["Set time to wait before jumping to the bottom of chat windows."] = "",
-	-- ["Text scroll direction"] = "",
-	-- Top = "",
+	["Text scroll direction"] = "텍스트 스크롤 방향",
+	Top = "위에서 아래로",
 }
 
 )
@@ -410,10 +410,10 @@ end
 
 do
 	local function scrollFrame(cf, up)
-		if IsShiftKeyDown() then
+		if IsControlKeyDown() then
 	        if up then cf:ScrollToTop() else cf:ScrollToBottom() end
 		else
-		    if IsControlKeyDown() then
+		    if IsShiftKeyDown() then
 		        for i = 1,module.db.profile.ctrlscrollspeed do
 		            if up then cf:ScrollUp() else cf:ScrollDown() end
 		        end

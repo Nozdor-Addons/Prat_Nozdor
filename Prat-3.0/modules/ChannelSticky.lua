@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -96,8 +96,8 @@ L:AddLocale("frFR",
 	-- ["Chat channel sticky options."] = "",
 	-- ChatType = "",
 	-- ["Per chat type options."] = "",
-	-- smartgroup_desc = "",
-	-- smartgroup_name = "",
+	smartgroup_desc = "Ajouter une commande /gr qui sélectionne automatiquement le bon type de chat : raid, groupe, champ de bataille",
+	smartgroup_name = "Groupes intelligents",
 	-- ["Sticky Per Chat Frame"] = "",
 	-- ["Sticky %s"] = "",
 	-- ["Toggle remembering the chat type last used per chat frame."] = "",
@@ -123,17 +123,17 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- Channel = "",
-	-- ChannelSticky = "",
-	-- ["Chat channel sticky options."] = "",
+	Channel = "채널",
+	ChannelSticky = "채널고정",
+	["Chat channel sticky options."] = "채팅 채널 고정 옵션.",
 	-- ChatType = "",
 	-- ["Per chat type options."] = "",
-	-- smartgroup_desc = "",
-	-- smartgroup_name = "",
-	-- ["Sticky Per Chat Frame"] = "",
-	-- ["Sticky %s"] = "",
+	smartgroup_desc = "자동으로 유효한 채팅 타입을 선택하도록 /gr 명령어를 추가합니다. (공격대, 파티 또는 전장)",
+	smartgroup_name = "스마트 그룹",
+	["Sticky Per Chat Frame"] = "채팅창 별 고정",
+	["Sticky %s"] = "%s 고정",
 	-- ["Toggle remembering the chat type last used per chat frame."] = "",
-	-- ["Toggles sticky on and off for %s."] = "",
+	["Toggles sticky on and off for %s."] = "입력고정 켜거나 끄기 %s.",
 }
 
 )
@@ -233,6 +233,8 @@ local chatList = {
     "BATTLEGROUND",
     "CHANNEL",
     "EMOTE",
+    "BN_WHISPER",
+    "BN_CONVERSATION",
 }
 
 local module = Prat:NewModule(PRAT_MODULE, "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
@@ -253,6 +255,8 @@ Prat:SetModuleDefaults(module, {
 	    emote = true,
 	    perframe = false,
 	    smartgroup = false,
+	    bn_whisper = true,
+	    bn_conversation=true,
 	}
 } )
 
@@ -264,11 +268,11 @@ Prat:SetModuleOptions(module, {
         type = "group",
 		plugins = chatTypePlugins,
         args = {
-            perframe = {
-                name = L["Sticky Per Chat Frame"],
-                desc = L["Toggle remembering the chat type last used per chat frame."],
-                type = "toggle",
-            },
+--            perframe = {
+--                name = L["Sticky Per Chat Frame"],
+--                desc = L["Toggle remembering the chat type last used per chat frame."],
+--                type = "toggle",
+--            },
 			smartgroup = {
 				name = L["smartgroup_name"],
 				desc = L["smartgroup_desc"],
@@ -302,7 +306,10 @@ function module:OnModuleEnable()
     self:Stickum("CHANNEL",prof.channel)
     self:Stickum("EMOTE",prof.emote)
 
-    self:StickyFrameChan(prof.perframe)
+    self:Stickum("BN_WHISPER",prof.bn_whisper)
+    self:Stickum("BN_CONVERSATION",prof.bn_conversation)
+    
+    --self:StickyFrameChan(prof.perframe)
     
     Prat.RegisterChatEvent(self, "Prat_OutboundChat")
     
@@ -342,67 +349,67 @@ function module:UPDATE_CHAT_COLOR()
 end
 
 function module:StickyFrameChan(enabled)
-    if not enabled then
-        self:UnhookAll()
-    else
-        self.perframe = {}
-        self.perframechannum = {}
-        self:RawHook("ChatFrame_OpenChat", true)
-        self:SecureHook("ChatEdit_OnEscapePressed")
-        self:SecureHook("SendChatMessage")
-        self:SecureHook("ChatEdit_OnEnterPressed")
-    end
+--    if not enabled then
+--        self:UnhookAll()
+--    else
+--        self.perframe = {}
+--        self.perframechannum = {}
+--        self:RawHook("ChatFrame_OpenChat", true)
+--        self:SecureHook("ChatEdit_OnEscapePressed")
+--        self:SecureHook("SendChatMessage")
+--        self:SecureHook("ChatEdit_OnEnterPressed")
+--    end
 end
 
-function module:ChatFrame_OpenChat(text, chatFrame)
-    if ( not chatFrame ) then
-        chatFrame = SELECTED_CHAT_FRAME
-    end
-
-	local eb = chatFrame.editBox
-
-    if eb == nil then
-        return self.hooks["ChatFrame_OpenChat"](text, chatFrame)
-    end
-    
-    local chatFrameN = chatFrame:GetName()
-
+--function module:ChatFrame_OpenChat(text, chatFrame)
+--    if ( not chatFrame ) then
+--        chatFrame = SELECTED_CHAT_FRAME
+--    end
+--
+--	local eb = chatFrame.editBox
+--
+--    if eb == nil then
+--        return self.hooks["ChatFrame_OpenChat"](text, chatFrame)
+--    end
+--    
+--    local chatFrameN = chatFrame:GetName()
+--
 	--Prat.Print(eb:GetAttribute("chatType"))
-
-    if eb:GetAttribute("chatType") == "WHISPER" then
-		-- NADA
+--
+--    if eb:GetAttribute("chatType") == "WHISPER" then
+	----	 NADA
 --    elseif eb:GetAttribute("chatType") == "GROUPSAY" then
 --        eb:SetAttribute("origchatType", "GROUPSAY");
-    elseif self.perframe[chatFrameN] then
-        eb:SetAttribute("channelTarget", self.perframechannum[chatFrameN]);
-        eb:SetAttribute("chatType", self.perframe[chatFrameN]);
-        eb:SetAttribute("stickyType", self.perframe[chatFrameN]);
-    end
-
-    self.hooks["ChatFrame_OpenChat"](text, chatFrame)
-end
-
-function module:SendChatMessage(msg, chatType, language, channel)
-    if self.memoNext then
-        self.perframe[self.memoNext] = chatType
-        self.perframechannum[self.memoNext] = channel
-    end
-end
-
-function module:ChatEdit_OnEscapePressed(this)
-    self.memoNext = nil
-end
-
-function module:ChatEdit_OnEnterPressed(this)
-	this = this or _G.this
-    local chatFrameN = SELECTED_CHAT_FRAME:GetName()
-    local chatType = this:GetAttribute("chatType")
-    
-    local channel = this:GetAttribute("channelTarget")
-    self.perframe[chatFrameN] = chatType
-    self.perframechannum[chatFrameN] = channel
-    self.memoNext = nil
-end
+--    elseif self.perframe[chatFrameN] then
+--        eb:SetAttribute("channelTarget", self.perframechannum[chatFrameN]);
+--        eb:SetAttribute("chatType", self.perframe[chatFrameN]);
+--        eb:SetAttribute("stickyType", self.perframe[chatFrameN]);
+--    end
+--
+--    self.hooks["ChatFrame_OpenChat"](text, chatFrame)
+--end
+--
+--function module:SendChatMessage(msg, chatType, language, channel)
+--    if self.memoNext then
+--        self.perframe[self.memoNext] = chatType
+--        self.perframechannum[self.memoNext] = channel
+--    end
+--end
+--
+--function module:ChatEdit_OnEscapePressed(this)
+--    self.memoNext = nil
+--end
+--
+--function module:ChatEdit_OnEnterPressed(this)
+--	this = this or _G.this
+--    local chatFrameN = SELECTED_CHAT_FRAME:GetName()
+--    local chatType = this:GetAttribute("chatType")
+--    
+--    local channel = this:GetAttribute("channelTarget")
+--    self.perframe[chatFrameN] = chatType
+--    self.perframechannum[chatFrameN] = channel
+--    self.memoNext = nil
+--end
 
 function module:Stickum(channel, stickied)
 	ChatTypeInfo[channel:upper()].sticky = stickied and 1 or 0

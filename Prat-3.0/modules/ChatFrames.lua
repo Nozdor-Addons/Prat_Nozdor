@@ -106,14 +106,14 @@ L:AddLocale("frFR",
 	-- Frames = "",
 	-- mainchatonload_desc = "",
 	-- mainchatonload_name = "",
-	-- maxchatheight_desc = "",
-	-- maxchatheight_name = "",
-	-- maxchatwidth_desc = "",
-	-- maxchatwidth_name = "",
-	-- minchatheight_desc = "",
-	-- minchatheight_name = "",
-	-- minchatwidth_desc = "",
-	-- minchatwidth_name = "",
+	maxchatheight_desc = "Définir la hauteur maximale pour toutes les fenêtres de discussion.",
+	maxchatheight_name = "Définir la hauteur maximale",
+	maxchatwidth_desc = "Définir la largeur maximale pour toutes les fenêtres de discussion.",
+	maxchatwidth_name = "Définir la largeur maximale",
+	minchatheight_desc = "Définir la hauteur minimum pour toutes les fenêtres de discussion.",
+	minchatheight_name = "Définir la hauteur minimum",
+	minchatwidth_desc = "Définir la largeur minimum pour toutes les fenêtres de discussion.",
+	minchatwidth_name = "Définir la largeur minimum",
 	-- removeclamp_desc = "",
 	-- removeclamp_name = "",
 }
@@ -189,7 +189,7 @@ L:AddLocale("ruRU",
 	framealpha_name = "Прозрачность окна чата",
 	-- Frames = "",
 	mainchatonload_desc = "Автоматически выбирает первое окно чата, и делает его активным при загрузке.",
-	mainchatonload_name = "Воздействовать на главное окно чата при загрузке", -- Needs review
+	mainchatonload_name = "Задействовать главное окно чата при загрузке", -- Needs review
 	maxchatheight_desc = "Устанавливает максимальную высоту для всех окон чата.",
 	maxchatheight_name = "Максимальная высоты",
 	maxchatwidth_desc = "Устанавливает максимальную ширину для всех окон чата.",
@@ -269,7 +269,13 @@ L:AddLocale("zhTW",
 --@end-non-debug@
 
 
-local mod = Prat:NewModule(PRAT_MODULE)
+local mod = Prat:NewModule(PRAT_MODULE, "AceHook-3.0")
+
+-- We have to set the insets here before blizzard has a chance to move them
+for i = 1, NUM_CHAT_WINDOWS do
+	local f = _G["ChatFrame" .. i]
+	f:SetClampRectInsets(0, 0, 0, 0)
+end
 
 
 Prat:SetModuleDefaults(mod.name, {
@@ -330,11 +336,23 @@ end
 Prat:SetModuleInit(mod, function(self) mod:GetDefaults() end)
 
 function mod:OnModuleEnable()
+    CHAT_FRAME_BUTTON_FRAME_MIN_ALPHA = 0
     self:ConfigureAllChatFrames(true)
+    self:RawHook("FCF_DockFrame", true)
 end
 
 function mod:OnModuleDisable()
+    CHAT_FRAME_BUTTON_FRAME_MIN_ALPHA = 0.2
     self:ConfigureAllChatFrames(false)
+end
+function mod:FCF_DockFrame(frame, ...)
+    if self.db.profile.removeclamp then
+        frame:SetClampRectInsets(0,0,0,0)
+    end
+   Prat.Frames[frame:GetName()] = frame
+   local m = Prat.Addon:GetModule("Font", true)
+   if m then m:ConfigureAllChatFrames() end
+   return self.hooks["FCF_DockFrame"](frame, ...)
 end
 
 --[[------------------------------------------------

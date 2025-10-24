@@ -259,115 +259,115 @@ Prat:AddModuleToLoad(function()
         end                  
     end
 	
-	Prat:AddModuleExtension(function() 
-		local module = Prat.Addon:GetModule("Timestamps", true)
-		
-		if not module then return end
+--	Prat:AddModuleExtension(function() 
+--		local module = Prat.Addon:GetModule("Timestamps", true)
+--		
+--		if not module then return end
+--	
+--		local L = module.L
+--	
+--		module.pluginopts["TwoColumnFrames"] = {  
+--			twocolumn =  {
+--				type = "toggle",
+--				name = L["twocolumn_name"],
+--				desc = L["twocolumn_desc"],
+--				order = 185
+--			}
+--		}
+--	
+--	    local orgOME = module.OnModuleEnable
+--		function module:OnModuleEnable(...) 
+--			orgOME(self, ...)
+--	
+--			if self.db.profile.twocolumn then
+--				SMFHax:Enable()
+--				SMFHax.twocolumn = true
+--			end
+--		end
+--
+--		function module:PlainTimestampNotAllowed() 
+--			return SMFHax.twocolumn
+--		end
+--	
+--		local ovc = module.OnValueChanged
+--		function module:OnValueChanged(info, b)
+--			ovc(self, info, b)
+--	
+--			if info[#info] == "twocolumn" then
+--				if SMFHax.twocolumn ~= b then
+--					SMFHax.twocolumn = b
+--					if b then
+--						SMFHax:Enable()
+--					else
+--						SMFHax:ClearColumn1()
+--					end
+--				end
+--			end
+--		end
+--	end ) -- Module Extension
 	
-		local L = module.L
 	
-		module.pluginopts["TwoColumnFrames"] = {  
-			twocolumn =  {
-				type = "toggle",
-				name = L["twocolumn_name"],
-				desc = L["twocolumn_desc"],
-				order = 185
-			}
-		}
-	
-	    local orgOME = module.OnModuleEnable
-		function module:OnModuleEnable(...) 
-			orgOME(self, ...)
-	
-			if self.db.profile.twocolumn then
-				SMFHax:Enable()
-				SMFHax.twocolumn = true
-			end
-		end
-
-		function module:PlainTimestampNotAllowed() 
-			return SMFHax.twocolumn
-		end
-	
-		local ovc = module.OnValueChanged
-		function module:OnValueChanged(info, b)
-			ovc(self, info, b)
-	
-			if info[#info] == "twocolumn" then
-				if SMFHax.twocolumn ~= b then
-					SMFHax.twocolumn = b
-					if b then
-						SMFHax:Enable()
-					else
-						SMFHax:ClearColumn1()
-					end
-				end
-			end
-		end
-	end ) -- Module Extension
-	
-	
-	Prat:AddModuleExtension(function() 
-		local module = Prat.Addon:GetModule("PlayerNames", true)
-		
-		if not module then return end
-	
-		local L = module.L
-		
-		module.pluginopts["HoverHilight"] = {  
-			hoverhilight =  {
-				type = "toggle",
-				name = L["hoverhilight_name"],
-				desc = L["hoverhilight_desc"],
-				order = 230
-			}
-		}
-		
-	
-		local function hoverOnHyperlinkEnter(frame, link, ...)
-			local linktype = link:match("^([^:]+)")
-			if linktype == "player" then
-				SMFHax.overPlayer = link:match("^[^:]+:([^:%]||]+)")
-			end
-		end
-		
-		local function hoverOnHyperlinkLeave(frame, ...)
-			SMFHax.overPlayer = nil
-		end
-	
-		local function hoverHilight(enable)
-			if (enable) then
-				SMFHax:Enable()
-				for k,v in pairs(Prat.HookedFrames) do
-					SMFHax:HookScript(v, "OnHyperlinkEnter", hoverOnHyperlinkEnter)
-					SMFHax:HookScript(v, "OnHyperlinkLeave", hoverOnHyperlinkLeave)
-				end
-			else
-				for k,v in pairs(Prat.HookedFrames) do
-					SMFHax:Unhook(v, "OnHyperlinkEnter")
-					SMFHax:Unhook(v, "OnHyperlinkLeave")
-				end
-			end
-		end
-	
-	    local orgOME = module.OnModuleEnable
-		function module:OnModuleEnable(...) 
-			orgOME(self, ...)
-	
-			if self.db.profile.hoverhilight then
-				hoverHilight(true)
-			end
-		end
-	
-		local ovc = module.OnValueChanged
-		function module:OnValueChanged(info, b)
-			ovc(self, info, b)
-	
-			if info[#info] == "hoverhilight" then
-				hoverHilight(b)
-			end
-		end
-	end ) -- Module Extension
+--	Prat:AddModuleExtension(function() 
+--		local module = Prat.Addon:GetModule("PlayerNames", true)
+--		
+--		if not module then return end
+--	
+--		local L = module.L
+--		
+--		module.pluginopts["HoverHilight"] = {  
+--			hoverhilight =  {
+--				type = "toggle",
+--				name = L["hoverhilight_name"],
+--				desc = L["hoverhilight_desc"],
+--				order = 230
+--			}
+--		}
+--		
+--	
+--		local function hoverOnHyperlinkEnter(frame, link, ...)
+--			local linktype = link:match("^([^:]+)")
+--			if linktype == "player" then
+--				SMFHax.overPlayer = link:match("^[^:]+:([^:%]||]+)")
+--			end
+--		end
+--		
+--		local function hoverOnHyperlinkLeave(frame, ...)
+--			SMFHax.overPlayer = nil
+--		end
+--	
+--		local function hoverHilight(enable)
+--			if (enable) then
+--				SMFHax:Enable()
+--				for k,v in pairs(Prat.HookedFrames) do
+--					SMFHax:HookScript(v, "OnHyperlinkEnter", hoverOnHyperlinkEnter)
+--					SMFHax:HookScript(v, "OnHyperlinkLeave", hoverOnHyperlinkLeave)
+--				end
+--			else
+--				for k,v in pairs(Prat.HookedFrames) do
+--					SMFHax:Unhook(v, "OnHyperlinkEnter")
+--					SMFHax:Unhook(v, "OnHyperlinkLeave")
+--				end
+--			end
+--		end
+--	
+--	    local orgOME = module.OnModuleEnable
+--		function module:OnModuleEnable(...) 
+--			orgOME(self, ...)
+--	
+--			if self.db.profile.hoverhilight then
+--				hoverHilight(true)
+--			end
+--		end
+--	
+--		local ovc = module.OnValueChanged
+--		function module:OnValueChanged(info, b)
+--			ovc(self, info, b)
+--	
+--			if info[#info] == "hoverhilight" then
+--				hoverHilight(b)
+--			end
+--		end
+--	end ) -- Module Extension
 
   return
 end ) -- Prat:AddModuleToLoad

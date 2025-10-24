@@ -98,12 +98,12 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- ["Addon message options."] = "",
-	-- AddonMsgs = "",
+	["Addon message options."] = "애드온 메시지 옵션.",
+	AddonMsgs = "애드온 메시지",
 	-- show_desc = "",
-	-- show_name = "",
+	show_name = "애드온 메시지 보기",
 	-- show_perframedesc = "",
-	-- show_perframename = "",
+	show_perframename = "대화창%d 애드온메시지 보이기",
 }
 
 )

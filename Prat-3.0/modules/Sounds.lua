@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -68,6 +68,8 @@ L:AddLocale("enUS", {
 	["officer_desc"] = "Sound for %s officer channel messages",
 	["whisper_name"] = "Whisper",
 	["whisper_desc"] = "Sound for %s whisper messages",
+	["bn_whisper_name"] = "Battle.Net Whisper",
+	["bn_whisper_desc"] = "Sound for %s Battle.Net whisper messages",	
 	["group_lead_name"] = "Group Leader",
 	["group_lead_desc"] = "Sound for %s raid leader, party leader or dungeon guide messages",	
     ["incoming"] = true,
@@ -87,6 +89,8 @@ L:AddLocale("enUS",
 {
 	["Add a custom channel"] = true,
 	["A module to play sounds on certain chat messages."] = true,
+	bn_whisper_desc = "Sound for %s Battle.Net whisper messages",
+	bn_whisper_name = "Battle.Net Whisper",
 	["Custom Channels"] = true,
 	group_lead_desc = "Sound for %s raid leader, party leader or dungeon guide messages",
 	group_lead_name = "Group Leader",
@@ -118,9 +122,11 @@ L:AddLocale("frFR",
 {
 	-- ["Add a custom channel"] = "",
 	-- ["A module to play sounds on certain chat messages."] = "",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	-- ["Custom Channels"] = "",
 	-- group_lead_desc = "",
-	-- group_lead_name = "",
+	group_lead_name = "Chef de groupe",
 	-- guild_desc = "",
 	guild_name = "Guilde",
 	-- incoming = "",
@@ -149,6 +155,8 @@ L:AddLocale("deDE",
 {
 	["Add a custom channel"] = "Einen allgemeinen Kanal hinzufügen.",
 	["A module to play sounds on certain chat messages."] = "Ein Modul, um bei bestimmten Mitteilungen, Töne abzuspielen.",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	["Custom Channels"] = "Allgemeine Kanäle",
 	group_lead_desc = "Klang für %s Schlachtzugsleiter, Gruppenführer oder Anleitungsmitteilungen für Instanzen.",
 	group_lead_name = "Gruppenführer",
@@ -178,32 +186,34 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- ["Add a custom channel"] = "",
+	["Add a custom channel"] = "사설 채널 추가",
 	-- ["A module to play sounds on certain chat messages."] = "",
-	-- ["Custom Channels"] = "",
-	-- group_lead_desc = "",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
+	["Custom Channels"] = "사설 채널",
+	group_lead_desc = "%s 공격대장, 파티장 또는 던전 길잡이 메시지의 소리",
 	group_lead_name = "공대장",
-	-- guild_desc = "",
-	-- guild_name = "",
+	guild_desc = "%s 길드 메시지 소리",
+	guild_name = "길드",
 	-- incoming = "",
 	-- ["Incoming Sounds"] = "",
-	-- officer_desc = "",
-	-- officer_name = "",
+	officer_desc = "%s 관리자 채널 메시지 소리",
+	officer_name = "관리자",
 	-- outgoing = "",
 	-- ["Outgoing Sounds"] = "",
-	-- party_desc = "",
-	-- party_name = "",
+	party_desc = "%s 파티 메시지 소리",
+	party_name = "파티",
 	-- ["Play a sound for a certain channel name (can be a substring)"] = "",
-	-- raid_desc = "",
-	-- raid_name = "",
-	-- ["Remove a custom channel"] = "",
-	-- ["Reset settings"] = "",
+	raid_desc = "%s 공격대 또는 전장 파티/장 메시지 소리",
+	raid_name = "공격대",
+	["Remove a custom channel"] = "사설 채널 제거",
+	["Reset settings"] = "설정 리셋",
 	-- ["Restore default settings and resets custom channel list"] = "",
-	-- Sounds = "",
+	Sounds = "소리",
 	-- ["Sound selection for incoming chat messages"] = "",
 	-- ["Sound selection for outgoing (from you) chat messages"] = "",
-	-- whisper_desc = "",
-	-- whisper_name = "",
+	whisper_desc = "%s 귓속말 메시지 소리",
+	whisper_name = "귓속말",
 }
 
 )
@@ -211,6 +221,8 @@ L:AddLocale("esMX",
 {
 	-- ["Add a custom channel"] = "",
 	-- ["A module to play sounds on certain chat messages."] = "",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	-- ["Custom Channels"] = "",
 	-- group_lead_desc = "",
 	-- group_lead_name = "",
@@ -242,6 +254,8 @@ L:AddLocale("ruRU",
 {
 	["Add a custom channel"] = "Добавить свой канал",
 	["A module to play sounds on certain chat messages."] = "Модуль проигрывает зуки для определённых сообщений в чате.",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	["Custom Channels"] = "Личные каналы",
 	group_lead_desc = "Звук для сообщений %s лидера рейда, лидера группы или проводника подземелья",
 	group_lead_name = "Лидер группы",
@@ -273,6 +287,8 @@ L:AddLocale("zhCN",
 {
 	["Add a custom channel"] = "添加自定义频道",
 	["A module to play sounds on certain chat messages."] = "在某些聊天信息播放声音的模块",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	["Custom Channels"] = "自定义频道",
 	-- group_lead_desc = "",
 	-- group_lead_name = "",
@@ -304,6 +320,8 @@ L:AddLocale("esES",
 {
 	["Add a custom channel"] = "Añadir un canal personalizado",
 	["A module to play sounds on certain chat messages."] = "Un módulo que reproduce sonidos con ciertos mensajes del chat.",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	["Custom Channels"] = "Canales Personalizados",
 	-- group_lead_desc = "",
 	-- group_lead_name = "",
@@ -335,6 +353,8 @@ L:AddLocale("zhTW",
 {
 	["Add a custom channel"] = "加入自訂頻道",
 	["A module to play sounds on certain chat messages."] = "模組：於特定聊天訊息播放音效。",
+	-- bn_whisper_desc = "",
+	-- bn_whisper_name = "",
 	["Custom Channels"] = "自訂頻道",
 	-- group_lead_desc = "",
 	group_lead_name = "隊長",
@@ -375,7 +395,7 @@ L:AddLocale("zhTW",
 --
 
 --
-
+ 
 --
 
 --
@@ -398,7 +418,8 @@ Prat:SetModuleDefaults(module.name, {
 			["PARTY"] = "Text1",
 			["RAID"] = "Text1",
 			["WHISPER"] = "Heart",
-            ["GROUP_LEAD"] = "Text2",
+			["BN_WHISPER"] = "Heart",
+			["GROUP_LEAD"] = "Text2",
 		},
 		["outgoing"] = {
 			["GUILD"] = "None",
@@ -406,7 +427,8 @@ Prat:SetModuleDefaults(module.name, {
 			["PARTY"] = "None",
 			["RAID"] = "None",
 			["WHISPER"] = "None",
-            ["GROUP_LEAD"] = "None",
+			["BN_WHISPER"] = "None",
+			["GROUP_LEAD"] = "None",
 		},
 		["customlist"] = GetLocale() == "zhTW" and {
 		}
@@ -528,6 +550,7 @@ do
 						guild = newOptionGroup("guild", true),
 						officer = newOptionGroup("officer", true),
 						whisper = newOptionGroup("whisper", true),
+						bn_whisper = newOptionGroup("bn_whisper", true),						
 						group_lead = newOptionGroup("group_lead", true),
 					},
 				},
@@ -542,6 +565,7 @@ do
 						guild = newOptionGroup("guild"),
 						officer = newOptionGroup("officer"),
 						whisper = newOptionGroup("whisper"),
+						bn_whisper = newOptionGroup("bn_whisper"),
 						group_lead = newOptionGroup("group_lead", true),
 					},
 				},
@@ -595,7 +619,13 @@ function module:Prat_PostAddMessage(info, message, frame, event, text, r, g, b, 
 		elseif msgtype == "WHISPER" then
 		    sndprof = self.db.profile.incoming
 		end
-
+		if msgtype == "BN_WHISPER_INFORM" then
+		    msgtype = "BN_WHISPER"
+		    sndprof = self.db.profile.outgoing
+		elseif msgtype == "BN_WHISPER" then
+		    sndprof = self.db.profile.incoming
+		end
+		
 		if msgtype == "PARTY_LEADER" or msgtype == "RAID_LEADER" or msgtype == "PARTY_GUIDE" then
 			msgtype = "GROUP_LEAD"
         end

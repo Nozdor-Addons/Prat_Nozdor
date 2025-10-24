@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -86,10 +86,10 @@ L:AddLocale("enUS",
 L:AddLocale("frFR",  
 {
 	-- ["Chat history options."] = "",
-	-- History = "",
-	-- ["Maximum number of lines of command history to save."] = "",
-	-- ["Save Command History"] = "",
-	-- ["Saves command history between sessions (for use with alt+up arrow or just the up arrow)"] = "",
+	History = "Historique",
+	["Maximum number of lines of command history to save."] = "Nombre maximum de ligne de commande à sauvegarder dans l'historique.",
+	["Save Command History"] = "Sauvegarder l'historique des commandes.",
+	["Saves command history between sessions (for use with alt+up arrow or just the up arrow)"] = "Sauvegarde l'historique des commandes entre les sessions (à utiliser avec alt+haut ou juste haut)",
 	-- ["Set Chat Lines"] = "",
 	-- ["Set Command History"] = "",
 	-- ["Set the number of lines of chat history for each window."] = "",
@@ -240,7 +240,9 @@ Prat:SetModuleOptions(module.name, {
 			name	= L["Save Command History"],
 			desc	= L["Saves command history between sessions (for use with alt+up arrow or just the up arrow)"],
 			type	= "toggle",
-			order	= 130,		},
+			order	= 130,
+			
+		},
 	}
 })
 
@@ -252,12 +254,12 @@ Prat:SetModuleOptions(module.name, {
 function module:OnModuleEnable()
 	self:ConfigureAllChatFrames()
 
-	if self.db.profile.savehistory and not Prat.BN_CHAT then
+	if self.db.profile.savehistory then
 		if not self.db.profile.cmdhistory then
 			self.db.profile.cmdhistory = {}
 		end
 
-		self:SecureHook(ChatFrameEditBox, "AddHistoryLine")
+		self:SecureHook(ChatFrame1EditBox, "AddHistoryLine")
 		self:addSavedHistory()
 	end
 end
@@ -333,7 +335,7 @@ function module:addSavedHistory(cmdhistory)
 
 	-- where there"s a while, there"s a way
 	while cmdindex > 0 do
-		ChatFrameEditBox:AddHistoryLine(cmdhistory[cmdindex])
+		ChatFrame1EditBox:AddHistoryLine(cmdhistory[cmdindex])
 		cmdindex = cmdindex - 1
 		-- way
 	end

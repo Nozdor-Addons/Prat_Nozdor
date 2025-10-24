@@ -1,5 +1,3 @@
-if Prat.BN_CHAT then return end -- Removed in 3.3.5 
-
 ---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
@@ -228,7 +226,7 @@ Prat:SetModuleOptions(module.name, {
     Module Event Functions
 ------------------------------------------------]]--
 function module:OnModuleEnable()
-    self:HookScript(ChatFrameEditBox, "OnTextChanged")
+    self:HookScript(ChatFrame1EditBox, "OnTextChanged")
 end
 
 function module:OnModuleDisable()
@@ -241,12 +239,12 @@ end
 function module:OnTextChanged(editBox, ...)
     local command, msg = editBox:GetText():match("^(/%S+)%s(.*)$")
     if command == "/tt" or command == L["/tt"] then
-        self:SendTellToTarget(editBox.chatFrame, msg)
+        self:SendTellToTarget(editBox.chatFrame, msg, editBox)
     end
     self.hooks[editBox].OnTextChanged(editBox, ...)
 end
 
-function module:SendTellToTarget(frame, text)
+function module:SendTellToTarget(frame, text, editBox)
 	if frame == nil then frame = DEFAULT_CHAT_FRAME end
 
 	local unitname, realm, fullname
@@ -260,8 +258,17 @@ function module:SendTellToTarget(frame, text)
             end
         end
     end
-	ChatFrame_SendTell((fullname and fullname:gsub(" ", "") or L["NoTarget"]), frame)
-    ChatFrameEditBox:SetText(text)
+    
+    local target = fullname and fullname:gsub(" ", "") or L["NoTarget"]
+    
+    if editBox then
+    	editBox:SetAttribute("chatType", "WHISPER");
+    	editBox:SetAttribute("tellTarget", target);
+    	editBox:SetText(text)
+    	ChatEdit_UpdateHeader(editBox);
+    else
+    	ChatFrame_SendTell(target, frame)
+    end
 end
 
 local function TellTarget(msg)

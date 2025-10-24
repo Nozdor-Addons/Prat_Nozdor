@@ -111,14 +111,14 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- autoabbreviate_desc = "",
-	-- autoabbreviate_name = "",
-	-- colon_desc = "",
-	-- colon_name = "",
-	-- randomclr_desc = "",
-	-- randomclr_name = "",
-	-- ["Server name abbreviation options."] = "",
-	-- ServerNames = "",
+	autoabbreviate_desc = "서버이름을 3글자로 줄임",
+	autoabbreviate_name = "자동-줄임",
+	colon_desc = "서버 대체이름 뒤에 콜론 추가",
+	colon_name = "콜론 보이기",
+	randomclr_desc = "서버이름에 무작위 색상 사용",
+	randomclr_name = "무작위 색상",
+	["Server name abbreviation options."] = "서버이름 줄이기 옵션.",
+	ServerNames = "서버이름",
 }
 
 )

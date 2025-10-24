@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -195,32 +195,32 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- ["Add Channel Abbreviation"] = "",
-	-- addnick_desc = "",
-	-- Blank = "",
+	["Add Channel Abbreviation"] = "채널 이름 줄임 추가",
+	addnick_desc = "채널 이름 줄이기 추가. 채널 이름에 #을 붙이면 채널 번호를 포함합니다. (예. '#거래').",
+	Blank = "공백",
 	-- chanlink_desc = "",
-	-- chanlink_name = "",
-	-- ["Channel %d"] = "",
-	-- ["Channel name abbreviation options."] = "",
-	-- ChannelNames = "",
-	-- channelnick_desc = "",
-	-- channelnick_name = "",
+	chanlink_name = "채널 링크 만들기",
+	["Channel %d"] = "채널 %d",
+	["Channel name abbreviation options."] = "채널 이름 줄이기 옵션.",
+	ChannelNames = "채널 이름",
+	channelnick_desc = "채널 이름 줄여쓰기",
+	channelnick_name = "채널 이름 줄여쓰기",
 	-- ["Clear Channel Abbreviation"] = "",
 	-- ["Clears an abbreviated channel name."] = "",
-	-- colon_desc = "",
-	-- colon_name = "",
+	colon_desc = "대체 채널 이름 뒤에 콜론 추가",
+	colon_name = "콜론 보이기",
 	-- ["Dont display the channel/chat type name"] = "",
 	-- otheropts_desc = "",
-	-- otheropts_name = "",
+	otheropts_name = "기타 옵션",
 	-- ["Remove Channel Abbreviation"] = "",
 	-- ["Removes an an abbreviated channel name."] = "",
-	-- Replace = "",
+	Replace = "교체",
 	-- Set = "",
 	-- space_desc = "",
-	-- space_name = "",
-	-- ["%s settings."] = "",
-	-- ["<string>"] = "",
-	-- ["Toggle replacing this channel."] = "",
+	space_name = "공간 보이기",
+	["%s settings."] = "%s 설정.",
+	["<string>"] = "<내용>",
+	["Toggle replacing this channel."] = "이 채널 이름 대체하기",
 	-- ["Use a custom replacement for the chat %s text."] = "",
 }
 
@@ -403,9 +403,14 @@ local orderMap = {
         "raidwarning",
         "battleground",
         "battlegroundleader",
+        "bnwhisper",
+        "bnwhisperincome",
+        "bnconversation",
 }
 
-
+if not CHAT_MSG_BN_WHISPER_INFORM then 
+    CHAT_MSG_BN_WHISPER_INFORM = "Outgoing Real ID Whisper";
+end
 
 -- Look Up Our Settings Key event..message.CHANNUM
 local eventMap = {
@@ -423,6 +428,8 @@ local eventMap = {
     CHAT_MSG_GUILD = "guild",
     CHAT_MSG_WHISPER = "whisperincome",
     CHAT_MSG_WHISPER_INFORM = "whisper",
+    CHAT_MSG_BN_WHISPER = "bnwhisperincome",
+    CHAT_MSG_BN_WHISPER_INFORM = "bnwhisper",
     CHAT_MSG_YELL = "yell",
     CHAT_MSG_PARTY = "party",
     CHAT_MSG_PARTY_LEADER = "partyleader",
@@ -433,6 +440,7 @@ local eventMap = {
     CHAT_MSG_RAID_WARNING = "raidwarning",
     CHAT_MSG_BATTLEGROUND = "battleground",
     CHAT_MSG_BATTLEGROUND_LEADER = "battlegroundleader",
+    CHAT_MSG_BN_CONVERSATION = "bnconversation"
 }
 
 local module = Prat:NewModule(PRAT_MODULE, "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0")
@@ -449,6 +457,8 @@ Prat:SetModuleDefaults(module.name, {
         say = true,
         whisper = true,
         whisperincome = true,
+        bnwhisper = true,
+        bnwhisperincome = true,
         yell = true,
         party = true,
         partyleader = true,
@@ -553,6 +563,8 @@ Prat:SetModuleDefaults(module.name, {
         say = "[S]",
         whisper = "[W To]",
         whisperincome = "[W From]",
+        bnwhisper = "[W To]",
+        bnwhisperincome = "[W From]",
         yell = "[Y]",
         party = "[P]",
         partyleader = "[PL]",
@@ -637,6 +649,8 @@ Prat:SetModuleOptions(module.name, {
     Module Event Functions
 ------------------------------------------------]]--
 
+
+
 function module:OnModuleEnable()
 	self:BuildChannelOptions()
     self:RegisterEvent("UPDATE_CHAT_COLOR", "RefreshOptions")
@@ -650,7 +664,7 @@ function module:OnModuleEnable()
 	Prat.EnableProcessingForEvent("CHAT_MSG_CHANNEL_LEAVE")
 	Prat.EnableProcessingForEvent("CHAT_MSG_CHANNEL_JOIN")
 
-    self:AddOutboundWhisperColoring()
+    --self:AddOutboundWhisperColoring()
 
     --self:RawHook("ChatEdit_UpdateHeader", true)
 end
@@ -662,32 +676,32 @@ end
 
 
 
-function module:ChatEdit_UpdateHeader(editBox, ...)
-    self.hooks["ChatEdit_UpdateHeader"](...)
-	
-    local type = editBox:GetAttribute("chatType");
-	if ( not type ) then
-		return;
-	end
-
-	local info = ChatTypeInfo[type];
-	local header = _G[editBox:GetName().."Header"];
-	if ( not header ) then
-		return;
-	end    
-
-    if ( type == "CHANNEL" ) then
-		local channel, channelName, instanceID = GetChannelName(editBox:GetAttribute("channelTarget"));
-		if ( channelName ) then
-			if ( instanceID > 0 ) then
-				channelName = channelName.." "..instanceID;
-			end
-			info = ChatTypeInfo["CHANNEL"..channel];
-			editBox:SetAttribute("channelTarget", channel);
-			header:SetFormattedText(CHAT_CHANNEL_SEND, channel, channelName);
-		end
-    end
-end
+--function module:ChatEdit_UpdateHeader(editBox, ...)
+--    self.hooks["ChatEdit_UpdateHeader"](...)
+--	
+--    local type = editBox:GetAttribute("chatType");
+--	if ( not type ) then
+--		return;
+--	end
+--
+--	local info = ChatTypeInfo[type];
+--	local header = _G[editBox:GetName().."Header"];
+--	if ( not header ) then
+--		return;
+--	end    
+--
+--    if ( type == "CHANNEL" ) then
+--		local channel, channelName, instanceID = GetChannelName(editBox:GetAttribute("channelTarget"));
+--		if ( channelName ) then
+--			if ( instanceID > 0 ) then
+--				channelName = channelName.." "..instanceID;
+--			end
+--			info = ChatTypeInfo["CHANNEL"..channel];
+--			editBox:SetAttribute("channelTarget", channel);
+--			header:SetFormattedText(CHAT_CHANNEL_SEND, channel, channelName);
+--		end
+--    end
+--end
 
 --[[------------------------------------------------
     Core Functions
@@ -702,18 +716,18 @@ function module:RefreshOptions()
 	LibStub("AceConfigRegistry-3.0"):NotifyChange("Prat")
 end
 
-function module:AddOutboundWhisperColoring()
-    if not CHAT_CONFIG_CHAT_RIGHT then return end
-
-	CHAT_CONFIG_CHAT_RIGHT[7] = {
-		text = CHAT_MSG_WHISPER_INFORM,
-		type = "WHISPER_INFORM",
-		checked = function () return IsListeningForMessageType("WHISPER"); end;
-		func = function (checked) ToggleChatMessageGroup(checked, "WHISPER"); end;
-	}
-
-	CHAT_CONFIG_CHAT_LEFT[#CHAT_CONFIG_CHAT_LEFT].text = CHAT_MSG_WHISPER
-end
+--function module:AddOutboundWhisperColoring()
+--    if not CHAT_CONFIG_CHAT_RIGHT then return end
+--
+--	CHAT_CONFIG_CHAT_RIGHT[7] = {
+--		text = CHAT_MSG_WHISPER_INFORM,
+--		type = "WHISPER_INFORM",
+--		checked = function () return IsListeningForMessageType("WHISPER"); end;
+--		func = function (checked) ToggleChatMessageGroup(checked, "WHISPER"); end;
+--	}
+--
+--	CHAT_CONFIG_CHAT_LEFT[#CHAT_CONFIG_CHAT_LEFT].text = CHAT_MSG_WHISPER
+--end
 
 function module:AddNickname(info, name)
     self.db.profile.nickname[info[#info-1]] = name
@@ -744,8 +758,14 @@ function module:Prat_FrameMessage(arg, message, frame, event)
             event = "CHAT_MSG_CHANNEL"
         end
 
+        local cfg
+        
+        if event == "CHAT_MSG_BN_CONVERSATION" then
+         cfg = eventMap[event]
+        else
+         cfg = eventMap[event..(message.CHANNELNUM or "")]
+        end
 
-        local cfg = eventMap[event..(message.CHANNELNUM or "")]
         if self.db.profile.nickname[message.CHANNEL] then
             message.CHANNEL = self.db.profile.nickname[message.CHANNEL]
 			if message.CHANNEL:sub(1,1) == "#" then

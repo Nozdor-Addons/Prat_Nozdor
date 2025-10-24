@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -242,46 +242,46 @@ L:AddLocale("deDE",
 )
 L:AddLocale("koKR",  
 {
-	-- ["Add a pattern to search for."] = "",
-	-- ["Add Pattern"] = "",
-	-- ["Block Message"] = "",
-	-- ["Channel Data"] = "",
-	-- ["Channel to send output text to."] = "",
-	-- Enabled = "",
+	["Add a pattern to search for."] = "검색할 양식 추가.",
+	["Add Pattern"] = "패턴 추가",
+	["Block Message"] = "차단 메시지",
+	["Channel Data"] = "채널 데이터",
+	["Channel to send output text to."] = "출력 텍스트를 보낼 채널.",
+	Enabled = "활성",
 	-- ["Extra data for WHISPER (target) and CHANNEL (channel name or num)"] = "",
 	-- ["Filter Name"] = "",
 	-- Forward = "",
 	-- ForwardCustom = "",
 	-- ForwardMessage = "",
-	-- ForwardMessageCustom = "",
+	ForwardMessageCustom = "사설 채널",
 	-- ["Forward the message to a chat channel."] = "",
-	-- ["Forward the message to a custom chat channel."] = "",
-	-- ["Hilight Color"] = "",
+	["Forward the message to a custom chat channel."] = "사설 채널로 출력",
+	["Hilight Color"] = "강조 색상",
 	-- ["Hilight Match Text"] = "",
 	-- Inbound = "",
 	-- inchannels_desc = "",
-	-- inchannels_name = "",
+	inchannels_name = "채널 검색",
 	-- ["Is this pattern enabled for use?"] = "",
 	-- ["Match Options"] = "",
 	-- module_desc = "",
 	-- module_name = "",
 	-- ["Only output the message portion of the chat text, leave out the channel, and playername etc."] = "",
 	-- Outbound = "",
-	-- ["Output Channel"] = "",
-	-- ["Output Message Only"] = "",
-	-- ["Pattern Info"] = "",
+	["Output Channel"] = "출력 채널",
+	["Output Message Only"] = "출력 메시지만",
+	["Pattern Info"] = "양식 정보",
 	-- ["Pattern Options"] = "",
-	-- ["Play a sound when this message is output to the chatframe"] = "",
-	-- ["Play Sound"] = "",
+	["Play a sound when this message is output to the chatframe"] = "이 메시지가 채팅창에 출력되면 소리를 재생합니다",
+	["Play Sound"] = "소리 재생",
 	-- ["Prevent the message from being displayed"] = "",
 	-- ["Remove an existing pattern."] = "",
 	-- ["Remove Pattern"] = "",
-	-- ["Replacement Text"] = "",
+	["Replacement Text"] = "대체 텍스트",
 	-- ["Search Format String"] = "",
 	-- ["Search Pattern"] = "",
 	-- ["Secondary Output"] = "",
 	-- ["Send to a secondary output"] = "",
-	-- ["<string>"] = "",
+	["<string>"] = "<내용>",
 	-- ["Supplied pattern is a format string instead of a pattern"] = "",
 	-- ["Your name for this filter"] = "",
 }
@@ -349,7 +349,7 @@ L:AddLocale("ruRU",
 	ForwardMessage = true,
 	ForwardMessageCustom = "Частный канал",
 	["Forward the message to a chat channel."] = "Пересылать сообщение в канал чата.",
-	["Forward the message to a custom chat channel."] = "Вывод в частный канал", -- Needs review
+	["Forward the message to a custom chat channel."] = "Вывод в частный канал",
 	["Hilight Color"] = "Цвет выделения",
 	["Hilight Match Text"] = "Выделение текста",
 	Inbound = "Входящие",
@@ -897,7 +897,11 @@ local function match(text, matchopts, mode)
  --   else        
 
         if matchopts.replacewith and matchopts.replacewith ~= matchopts.searchfor then
-            textout = matchopts.replacewith
+            if matchopts.replacewith:find("%%1") then
+                textout = matchopts.replacewith:gsub("%%1", textout)
+            else
+                textout = matchopts.replacewith
+            end
         end
         
         if matchopts.hilight then 

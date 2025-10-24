@@ -83,9 +83,9 @@ L:AddLocale("frFR",
 	duration_desc = "Définir le nombre de secondes à attendre avant la disparition du texte de la fenêtre de chat",
 	-- duration_name = "",
 	-- module_desc = "",
-	-- module_name = "",
-	-- textfade_desc = "",
-	-- textfade_name = "",
+	module_name = "Fondu",
+	textfade_desc = "Activé la disparition de chaque fenêtre de chat",
+	textfade_name = "Activé la disparition",
 }
 
 )

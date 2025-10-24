@@ -70,8 +70,8 @@ L:AddLocale("enUS",
 )
 L:AddLocale("frFR",  
 {
-	-- ChannelColorMemory = "",
-	-- ["Remembers the colors of each channel name."] = "",
+	ChannelColorMemory = "MémoriserCouleurCanal",
+	["Remembers the colors of each channel name."] = "Mémoriser la couleur de chaque nom de canal.",
 	-- ["(%w+)%s?(.*)"] = "",
 }
 
@@ -102,7 +102,7 @@ L:AddLocale("esMX",
 )
 L:AddLocale("ruRU",  
 {
-	-- ChannelColorMemory = "",
+	ChannelColorMemory = "Сохранение цветов каналов",
 	["Remembers the colors of each channel name."] = "Запоминает цвета названия каждого канала.",
 	["(%w+)%s?(.*)"] = true, -- Needs review
 }

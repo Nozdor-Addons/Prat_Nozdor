@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -86,6 +86,9 @@ L:AddLocale("enUS", {
     ["hoverhilight_name"] = "Hover Hilighting",
 	["hoverhilight_desc"] = "Hilight chat lines from a specific player when hovering over thier playerlink",
 
+    ["realidcolor_name"] = "RealID Coloring",
+    ["realidcolor_desc"] = "RealID Name Coloring",
+
     ["Keep Info"] = true,
     ["Keep Lots Of Info"] = true,
     ["Keep player information between session for all players except cross-server players"] = true,
@@ -153,6 +156,8 @@ L:AddLocale("enUS",
 	["Prat_Playernames: Stored Player Data Cleared"] = true,
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = true,
 	Random = true,
+	realidcolor_desc = "RealID Name Coloring",
+	realidcolor_name = "RealID Coloring",
 	["Reset Settings"] = true,
 	["Restore default settings, and delete stored character data."] = true,
 	["Set common color of unknown player names."] = true,
@@ -215,6 +220,8 @@ L:AddLocale("frFR",
 	-- ["Prat_Playernames: Stored Player Data Cleared"] = "",
 	-- ["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "",
 	-- Random = "",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	-- ["Reset Settings"] = "",
 	-- ["Restore default settings, and delete stored character data."] = "",
 	-- ["Set common color of unknown player names."] = "",
@@ -277,6 +284,8 @@ L:AddLocale("deDE",
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_Playernames: Gespeicherte Spielerdaten gelöscht",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "Alle uns unbekannten Spielernamen beim Server abfragen. Merke: dies passiert ziemlich langsam und diese Daten sind nicht gespeichert.",
 	Random = "Zufällig",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "Einstellungen zurücksetzen",
 	["Restore default settings, and delete stored character data."] = "Standardeinstellungen wiederherstellen und gespeicherte Charakterdaten löschen.",
 	["Set common color of unknown player names."] = "Allgemein übliche Farbe bei unbekannten Spielernamen einstellen.",
@@ -314,13 +323,13 @@ L:AddLocale("koKR",
 	["Brackets Use Common Color"] = "괄호에 색깔 사용",
 	Class = "직업",
 	["Color by Level Difference"] = "레벨 차이에 의한 색깔",
-	-- coloreverywhere_desc = "",
-	-- coloreverywhere_name = "",
+	coloreverywhere_desc = "채팅 메시지에 나타나는 플레이어 이름에 색상 적용",
+	coloreverywhere_name = "모든 곳에서 이름에 색상 사용",
 	["Enable Alt-Invite"] = "Alt 초대 켜기",
 	["Enable Invite Links"] = "초대 링크 켜기",
 	["Enable TabComplete"] = "탭완성 켜기",
-	-- hoverhilight_desc = "",
-	-- hoverhilight_name = "",
+	hoverhilight_desc = "플레이어 이름 위에 마우스 오버 시 채팅 내용을 강조합니다",
+	hoverhilight_name = "마우스 오버 강조",
 	["How to color other player's level."] = "다른 플레이어들의 레벨 색깔 방법",
 	["How to color player's name."] = "플레이어 이름 색깔 방법",
 	["Keep Info"] = "길드유저 정보 저장",
@@ -337,33 +346,35 @@ L:AddLocale("koKR",
 	["Player name formating options."] = "플레이어 이름 형식 설정",
 	PlayerNames = "플레이어 이름",
 	-- ["Prat_Playernames: Stored Player Data Cleared"] = "",
-	-- ["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "",
+	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "알 수 없는 모든 플레이어 이름 정보를 서버에 요청합니다. 주의: 작동 시 느려질 수 있으며, 수집된 정보들은 저장되지 않습니다.",
 	Random = "무작위",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "설정 초기화",
 	["Restore default settings, and delete stored character data."] = "기본 설정을 복구하고 저장된 케릭터 설정을 지웁니다.",
-	-- ["Set common color of unknown player names."] = "",
-	-- ["Sets common color of brackets to use around player names."] = "",
-	-- ["Sets style of brackets to use around player names."] = "",
+	["Set common color of unknown player names."] = "알 수 없는 플레이어 이름 색상 설정",
+	["Sets common color of brackets to use around player names."] = "플레이어 이름 괄호의 일반 색상 설정",
+	["Sets style of brackets to use around player names."] = "플레이어 이름 주변 괄호 설정",
 	["Show Group"] = "그룹 보이기",
 	["Show Level"] = "레벨 보이기",
-	-- ["Show Raid Target Icon"] = "",
-	-- Square = "",
+	["Show Raid Target Icon"] = "전술 아이콘 보이기",
+	Square = "사각형",
 	-- tabcomplete_name = "",
-	-- ["Tab completion : "] = "",
-	-- ["Toggle group invites by alt-clicking hyperlinked keywords like 'invite'."] = "",
-	-- ["Toggle group invites by alt-clicking on player name."] = "",
-	-- ["Toggle level showing."] = "",
-	-- ["Toggle raid group showing."] = "",
-	-- ["Toggle showing the raid target icon which is currently on the player."] = "",
-	-- ["Toggle tab completion of player names."] = "",
-	-- ["Toggle using a common color for brackets around player names."] = "",
-	-- ["Toggle using a common color for unknown player names."] = "",
+	["Tab completion : "] = "탭 완성 :",
+	["Toggle group invites by alt-clicking hyperlinked keywords like 'invite'."] = "'초대'같은 단어를 Alt-클릭으로 초대하기",
+	["Toggle group invites by alt-clicking on player name."] = "플레이어 이름 Alt-클릭으로 초대하기",
+	["Toggle level showing."] = "레벨 보이기",
+	["Toggle raid group showing."] = "공격대 파티 보이기",
+	["Toggle showing the raid target icon which is currently on the player."] = "플레이어에게 지정된 전술 아이콘 보이기",
+	["Toggle tab completion of player names."] = "플레이어 이름 탭 완성 켜기",
+	["Toggle using a common color for brackets around player names."] = "플레이어 이름 주변 괄호 색상 사용",
+	["Toggle using a common color for unknown player names."] = "알 수 없는 플레이어 이름에 일반 색상 사용하기",
 	-- ["Too many matches (%d possible)"] = "",
-	-- ["Unknown Common Color"] = "",
+	["Unknown Common Color"] = "알 수 없는 일반 색상",
 	-- ["Unknown Common Color From TasteTheNaimbow"] = "",
-	-- ["Unknown Use Common Color"] = "",
-	-- ["Use Channel Color"] = "",
-	-- ["Use Player Color"] = "",
+	["Unknown Use Common Color"] = "알 수 없는 이름에 색상 사용",
+	["Use Channel Color"] = "채널 색상 사용",
+	["Use Player Color"] = "플레이어 색상 사용",
 }
 
 )
@@ -401,6 +412,8 @@ L:AddLocale("esMX",
 	-- ["Prat_Playernames: Stored Player Data Cleared"] = "",
 	-- ["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "",
 	-- Random = "",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	-- ["Reset Settings"] = "",
 	-- ["Restore default settings, and delete stored character data."] = "",
 	-- ["Set common color of unknown player names."] = "",
@@ -463,6 +476,8 @@ L:AddLocale("ruRU",
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_Playernames: Информация о собеседниках очищена",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "Запрос сервера для всех неизвестных играков. Заметка: Это происходит дастаточно медленно, и их данные не сохраняются.",
 	Random = "Случайно",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "Сброс настроек",
 	["Restore default settings, and delete stored character data."] = "Восстановить настройки по умолчанию и удалить сохраненную информацию о собеседниках.",
 	["Set common color of unknown player names."] = "Выбор цвета, которым будут окрашены неизвестные игроки.",
@@ -525,6 +540,8 @@ L:AddLocale("zhCN",
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_玩家名称: 玩家数据存储已清除",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "为所有未知玩家查询服务器,注意:这将非常缓慢,并且数据不会被存储",
 	Random = "随机",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "重置设置",
 	["Restore default settings, and delete stored character data."] = "恢复默认设置并删除已存角色数据",
 	["Set common color of unknown player names."] = "设置未知玩家名称共有颜色",
@@ -587,6 +604,8 @@ L:AddLocale("esES",
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_Playernames: Limpiados los Datos de Jugador Guardados",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "Consulta el servidor para todos los nombres de jugador que desconocemos. Nota: esto sucede muy lentamente, y estos datos no se guardan.",
 	Random = "Aleatorio",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "Restablecer Ajustes",
 	["Restore default settings, and delete stored character data."] = "Restablece ajustes por defecto, y eliminar información del jugador guardada.",
 	["Set common color of unknown player names."] = "Establece el color común para los nombres de jugadores desconocidos.",
@@ -649,6 +668,8 @@ L:AddLocale("zhTW",
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_Playernames：已清除儲存的玩家資料",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "查詢所有此伺服器我們不知道的角色名稱。備註：這個程序相當緩慢且並不會儲存此資料。",
 	Random = "隨機",
+	-- realidcolor_desc = "",
+	-- realidcolor_name = "",
 	["Reset Settings"] = "重置設定",
 	["Restore default settings, and delete stored character data."] = "恢復至預設值且刪除儲存的角色資料。",
 	["Set common color of unknown player names."] = "設定未知角色的顯示色彩",
@@ -709,6 +730,7 @@ Prat:SetModuleDefaults(module.name, {
 	    keep = false,
 	    keeplots = false,
 	    colormode = "CLASS",
+	    realidcolor = "RANDOM",
 		coloreverywhere = true,
 	    usecommoncolor = true,
 	    altinvite = false,
@@ -829,6 +851,13 @@ Prat:SetModuleOptions(module, {
                 type = "select",
                 order = 130,
                 values = {["RANDOM"] = L["Random"], ["CLASS"] = L["Class"], ["NONE"] = L["None"]}
+            },
+            realidcolor = {
+                name = L["realidcolor_name"],
+                desc = L["realidcolor_desc"],
+                type = "select",
+                order = 135,
+                values = {["RANDOM"] = L["Random"], ["NONE"] = L["None"]}
             },
             levelcolor = {
                 name = L["Level Color Mode"],
@@ -1265,6 +1294,8 @@ end
 function module:FormatPlayer(message, Name, frame, class)
     if not Name or Name:len() == 0 then return end
     
+
+    
     local storedclass, level, subgroup = self:GetData(Name, frame)
 	if class == nil then 
 		class = storedclass
@@ -1296,9 +1327,14 @@ function module:FormatPlayer(message, Name, frame, class)
 		end
 	end
 
-    -- Add the player name in the proper color
-    message.PLAYER = CLR:Player(message.PLAYER, Name, class)
-
+    if message.PLAYERLINKDATA and (message.PLAYERLINKDATA:find("BN_") and message.PLAYER ~= UnitName("player")) then
+        if self.db.profile.realidcolor == "RANDOM" then
+            message.PLAYER = CLR:Random(message.PLAYER, message.PLAYER:lower())
+        end
+    else
+        -- Add the player name in the proper color
+        message.PLAYER = CLR:Player(message.PLAYER, Name, class)
+    end
 
     -- Add the correct bracket style and color
     local prof_brackets = self.db.profile.brackets
@@ -1377,7 +1413,7 @@ function module:Prat_FrameMessage(info, message, frame, event)
 
     local class, level, subgroup = self:GetData(Name)
 
-	if class == nil and message.ORG.GUID and message.ORG.GUID:len() > 0 then 		
+	if (class == nil) and message and message.ORG and message.ORG.GUID and message.ORG.GUID:len() > 0 then 		
 		_, class = GetPlayerInfoByGUID(message.ORG.GUID)
 
         if class ~= nil and EVENTS_FOR_CACHE_GUID_DATA[event] then

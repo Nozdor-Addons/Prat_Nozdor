@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -180,7 +180,7 @@ L:AddLocale("koKR",
 	PopupMessage = "팝업메시지",
 	["Remove Nickname"] = "별명 제거",
 	["Removes an alternate name to show in popups."] = "팝업에 표시될 별명을 제거합니다.",
-	["Set Separately"] = true, -- Needs review
+	["Set Separately"] = "분리 설정",
 	showall_desc = "모든 채팅창에 팝업을 표시합니다.",
 	showall_name = "팝업 모두 표시",
 	["Show All Popups"] = "팝업 모두 표시",
@@ -547,7 +547,7 @@ function module:Prat_PostAddMessage(info, message, frame, event, text, r, g, b, 
     
 	if not (EVENTS_EMOTES[event] or EVENTS_IGNORE[event]) then
 		if self.db.profile.showall or self.db.profile.show[frame:GetName()] then
-			if DEBUG or not (message.PLAYERLINK and self.playerName and message.PLAYERLINK:match(self.playerName)) then
+			if DEBUG or not (message.ORG.PLAYER and self.playerName and message.ORG.PLAYER:match(self.playerName)) then
 				self:CheckText(message.ORG.MESSAGE, message.OUTPUT, event, r, g, b)
 			end
 		end

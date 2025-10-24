@@ -1,6 +1,6 @@
 -- This is the editbox module from Chatter by Antiarc
 
-if Prat.BN_CHAT then return end -- Removed in 3.3.5 
+if not Prat.BN_CHAT then return end -- Requires 3.3.5
 
 Prat:AddModuleToLoad(function() 
 
@@ -125,25 +125,25 @@ L:AddLocale("koKR",
 {
 	-- ["Attach edit box to..."] = "",
 	-- ["Attach to..."] = "",
-	-- ["Background color"] = "",
+	["Background color"] = "배경 색상",
 	-- ["Background Inset"] = "",
-	-- ["Background texture"] = "",
-	-- ["Border color"] = "",
-	-- ["Border texture"] = "",
+	["Background texture"] = "배경 텍스쳐",
+	["Border color"] = "테두리 색상",
+	["Border texture"] = "테두리 텍스쳐",
 	Bottom = "아래",
-	-- ["Color border by channel"] = "",
-	-- ["Edge Size"] = "",
+	["Color border by channel"] = "채널 테두리 색상",
+	["Edge Size"] = "모서리 크기",
 	Editbox = "대화입력창",
 	["Editbox options."] = "대화입력창을 설정합니다.",
-	-- Font = "",
-	-- ["Free-floating"] = "",
-	-- ["Free-floating, Locked"] = "",
-	-- ["Requires the Alt key to be held down to move the cursor in chat"] = "",
-	-- ["Select the font to use for the edit box"] = "",
-	-- ["Sets the frame's border color to the color of your currently active channel"] = "",
+	Font = "폰트",
+	["Free-floating"] = "자유로운 이동",
+	["Free-floating, Locked"] = "자유로운 이동, 잠금",
+	["Requires the Alt key to be held down to move the cursor in chat"] = "대화 입력창 커서 이동에 Alt 키를 사용합니다",
+	["Select the font to use for the edit box"] = "대화 입력창에 사용할 폰트 선택",
+	["Sets the frame's border color to the color of your currently active channel"] = "대화 입력창 테두리 색상을 현재 채널 색상으로 설정",
 	-- ["Tile Size"] = "",
 	Top = "위",
-	-- ["Use Alt key for cursor movement"] = "",
+	["Use Alt key for cursor movement"] = "커서 이동에 Alt 키 사용",
 }
 
 )
@@ -178,7 +178,7 @@ L:AddLocale("ruRU",
 	["Attach edit box to..."] = "Закрепить поле ввода к...",
 	["Attach to..."] = "Закрепить к...",
 	["Background color"] = "Цвет фона",
-	["Background Inset"] = "Фоновая врезка", -- Needs review
+	["Background Inset"] = "Фоновая врезка",
 	["Background texture"] = "Текстура фона",
 	["Border color"] = "Цвет границ",
 	["Border texture"] = "Текстура границы",
@@ -188,8 +188,8 @@ L:AddLocale("ruRU",
 	Editbox = true,
 	["Editbox options."] = "Настройки поле ввода.",
 	Font = "Шрифт",
-	-- ["Free-floating"] = "",
-	-- ["Free-floating, Locked"] = "",
+	["Free-floating"] = "Свободно",
+	["Free-floating, Locked"] = "Свободно, заблокировано",
 	["Requires the Alt key to be held down to move the cursor in chat"] = "Для перемещения курсора в чат требуется нажатая клавиша Alt",
 	["Select the font to use for the edit box"] = "Выбор шрифта для области редактирования",
 	["Sets the frame's border color to the color of your currently active channel"] = "Установить окраску границы в цвет вашего активного канала",
@@ -298,6 +298,18 @@ local VALID_ATTACH_POINTS = {
 	LOCK = L["Free-floating, Locked"]
 }
 
+local function updateEditBox(method, ...)
+	for i = 1, NUM_CHAT_WINDOWS do
+		local f = _G["ChatFrame" .. i .. "EditBox"]
+		f[method](f, ...)
+	end
+--	for index,name in ipairs(mod.TempChatFrames) do
+--		local cf = _G[name.."EditBox"]
+--		if cf then
+--			cf[method](f,args)
+--		end
+--	end
+end
 
 Prat:SetModuleOptions(mod, {
     name = L["Editbox"],
@@ -423,8 +435,10 @@ Prat:SetModuleOptions(mod, {
 				else
 					if mod:IsHooked("ChatEdit_UpdateHeader") then
 						mod:Unhook("ChatEdit_UpdateHeader")
-						local c = mod.db.profile.borderColor
-						mod.frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
+					local c = mod.db.profile.borderColor
+					for _, frame in ipairs(self.frames) do
+						frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
+					end
 					end
 				end
 			end
@@ -434,11 +448,11 @@ Prat:SetModuleOptions(mod, {
 			name = L["Use Alt key for cursor movement"],
 			desc = L["Requires the Alt key to be held down to move the cursor in chat"],
 			get = function()
-				return mod.db.profile.useAlt
+				return mod.db.profile.useAltKey
 			end,
 			set = function(info, v)
-				mod.db.profile.useAlt = v
-				ChatFrameEditBox:SetAltArrowKeyMode(v)
+				mod.db.profile.useAltKey = v
+			updateEditBox("SetAltArrowKeyMode", v)
 			end
 		},
 		font = {
@@ -449,10 +463,27 @@ Prat:SetModuleOptions(mod, {
 			get = function() return mod.db.profile.font end,
 			set = function(i, v)
 				mod.db.profile.font = v
-				local f, s, m = ChatFrameEditBox:GetFont()
-				ChatFrameEditBox:SetFont(Media:Fetch("font", v), s, m)
+			for i = 1, NUM_CHAT_WINDOWS do
+				local ff = _G["ChatFrame"..i.."EditBox"]
+				local _, s, m = ff:GetFont()
+				ff:SetFont(Media:Fetch("font", v), s, m)
 			end
-		}
+		end
+	},
+--	height = {
+--		type = "range",
+--		name = L["Height"],
+--		desc = L["Select the height of the edit box"],
+--		min = 5,
+--		max = 50,
+--		step = 1,
+--		bigStep = 1,
+--		get = function() return mod.db.profile.height end,
+--		set = function(i, v)
+--			mod.db.profile.height = v
+--			mod:UpdateHeight()
+--		end
+--		}
 	}
 } )
 
@@ -460,19 +491,24 @@ Prat:SetModuleDefaults(mod.name, {
 	profile = {
 		on = true,
 		background = "Blizzard Tooltip",
-		border = "Blizzard Dialog",
+		border = "Blizzard Tooltip",
+		hideDialog = true,
 		backgroundColor = {r = 0, g = 0, b = 0, a = 1},
 		borderColor = {r = 1, g = 1, b = 1, a = 1},
-		colorByChannel = true,
-		inset = 4,
-		edgeSize = 24,
+		inset = 3,
+		edgeSize = 12,
 		tileSize = 16,
+		height = 22,
 		attach = "BOTTOM",
-		useAltKey = true,
+		colorByChannel = true,
+		useAltKey = false,
 		font = (function()
-			local f = ChatFrameEditBox:GetFont()
+			for i = 1, NUM_CHAT_WINDOWS do
+				local ff = _G["ChatFrame"..i.."EditBox"]
+				local f = ff:GetFont()
 			for k,v in pairs(Media:HashTable("font")) do
 				if v == f then return k end
+				end
 			end
 		end)()
 	}
@@ -494,67 +530,190 @@ end
 Prat:SetModuleInit(mod, 
 	function(self)
 		
-		Media.RegisterCallback(mod, "LibSharedMedia_Registered")
+	Media.RegisterCallback(mod, "LibSharedMedia_Registered")
+	self.frames = {}	
 
-		if self.db.profile.position then
-		   self.db.profile.attach = self.db.profile.position
-		   self.db.profile.position = nil
-		end
-
-		self.frame = CreateFrame("Frame", nil, ChatFrameEditBox)
-		self.frame:SetAllPoints(ChatFrameEditBox)
-		ChatFrameEditBox:SetFrameStrata("TOOLTIP")
-		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
-		
-		self.lDrag = CreateFrame("Frame", nil, ChatFrameEditBox)
-		self.lDrag:SetWidth(15)
-		self.lDrag:SetPoint("TOPLEFT", ChatFrameEditBox, "TOPLEFT")
-		self.lDrag:SetPoint("BOTTOMLEFT", ChatFrameEditBox, "BOTTOMLEFT")
 	
-		self.rDrag = CreateFrame("Frame", nil, ChatFrameEditBox)
-		self.rDrag:SetWidth(15)
-		self.rDrag:SetPoint("TOPRIGHT", ChatFrameEditBox, "TOPRIGHT")
-		self.rDrag:SetPoint("BOTTOMRIGHT", ChatFrameEditBox, "BOTTOMRIGHT")
+	self:LibSharedMedia_Registered()
+	
+	
+	for i = 1, NUM_CHAT_WINDOWS do
+		local parent = _G["ChatFrame"..i.."EditBox"]
+
+
+		local frame = CreateFrame("Frame", nil, parent)
+		frame:SetFrameStrata("DIALOG")
 		
-		self.lDrag.left = true
-	end )
+		frame:SetFrameLevel(parent:GetFrameLevel() - 1)
+		frame:SetAllPoints(parent)
+		frame:Hide()
+		
+		parent.lDrag = CreateFrame("Frame", nil, parent)
+		parent.lDrag:SetWidth(15)
+		parent.lDrag:SetPoint("TOPLEFT", parent, "TOPLEFT")
+		parent.lDrag:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT")
+	
+		parent.rDrag = CreateFrame("Frame", nil, parent)
+		parent.rDrag:SetWidth(15)
+		parent.rDrag:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
+		parent.rDrag:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT")
+		parent.lDrag.left = true
+		parent.frame = frame
+		tinsert(self.frames, frame)
+	end
+end )
+		
+--function mod:Decorate(chatframe)
+-- -- prevent duplicate creation
+--	for index,f in ipairs(self.frames) do
+--		if f.owner == chatframe then
+--			return nil
+--		end
+--	end
+--	local parent = _G[chatframe:GetName().."EditBox"]
+--	local frame = CreateFrame("Frame", nil, parent)
+--	frame:SetFrameStrata("DIALOG")
+--	frame:SetFrameLevel(parent:GetFrameLevel() - 1)
+--	frame:SetAllPoints(parent)
+--	frame.owner = chatframe
+--	frame:Hide()
+--	parent.lDrag = CreateFrame("Frame", nil, parent)
+--	parent.lDrag:SetWidth(15)
+--	parent.lDrag:SetPoint("TOPLEFT", parent, "TOPLEFT")
+--	parent.lDrag:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT")
+--	parent.rDrag = CreateFrame("Frame", nil, parent)
+--	parent.rDrag:SetWidth(15)
+--	parent.rDrag:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
+--	parent.rDrag:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT")
+--	parent.lDrag.left = true
+--	parent.frame = frame
+--	tinsert(self.frames, frame)
+--	local name = chatframe:GetName()
+--	local f = _G[name.."EditBox"]
+--	_G[name.."EditBoxLeft"]:Hide()
+--	_G[name.."EditBoxRight"]:Hide()
+--	_G[name.."EditBoxMid"]:Hide()
+--	_G[name.."EditBoxFocusLeft"]:SetTexture(nil)
+--	_G[name.."EditBoxFocusRight"]:SetTexture(nil)
+--	_G[name.."EditBoxFocusMid"]:SetTexture(nil)
+--	f:Hide()
+--	self.frames[#self.frames]:Show()
+--	local font, s, m = f:GetFont()
+--	f:SetFont(Media:Fetch("font", self.db.profile.font), s, m)
+--	local header = _G[f:GetName().."Header"]
+--	local font, s, m = header:GetFont()
+--	header:SetFont(Media:Fetch("font", self.db.profile.font), s, m)
+--		
+--	self:SetAttach(f, self.db.profile.editX, self.db.profile.editY, self.db.profile.editW)
+--end
 
 function mod:OnEnable()
 	self:LibSharedMedia_Registered()
-	ChatFrameEditBox:SetAltArrowKeyMode(mod.db.profile.useAlt)
-	local left, mid, right = select(6, ChatFrameEditBox:GetRegions())
-	left:Hide()
-	mid:Hide()
-	right:Hide()
-	self.frame:Show()
-	self:SetBackdrop()
+
+	for i = 1, NUM_CHAT_WINDOWS do
+		local f = _G["ChatFrame"..i.."EditBox"]
+		_G["ChatFrame"..i.."EditBoxLeft"]:Hide()
+		_G["ChatFrame"..i.."EditBoxRight"]:Hide()
+		_G["ChatFrame"..i.."EditBoxMid"]:Hide()
+		_G["ChatFrame"..i.."EditBoxFocusLeft"]:SetTexture(nil)
+		_G["ChatFrame"..i.."EditBoxFocusRight"]:SetTexture(nil)
+		_G["ChatFrame"..i.."EditBoxFocusMid"]:SetTexture(nil)
+		f:Hide()
+
+        -- Prevent an error in FloatingChatFrame FCF_FadeOutChatFrame() (blizz bug)
+		f:SetAlpha(f:GetAlpha() or 0)
+		
+		self.frames[i]:Show()
+		local font, s, m = f:GetFont()
+		f:SetFont(Media:Fetch("font", self.db.profile.font), s, m)		
+		
+		local header = _G[f:GetName().."Header"]
+    	local font, s, m = header:GetFont()
+    	header:SetFont(Media:Fetch("font", self.db.profile.font), s, m)			
+	end
+	updateEditBox("SetAltArrowKeyMode", mod.db.profile.useAltKey and 1 or nil)
+
+--	for index,name in ipairs(self.TempChatFrames) do
+--		local f = _G[name.."EditBox"]
+--		_G[name.."EditBoxLeft"]:Hide()
+--		_G[name.."EditBoxRight"]:Hide()
+--		_G[name.."EditBoxMid"]:Hide()
+--		_G[name.."EditBoxFocusLeft"]:SetTexture(nil)
+--		_G[name.."EditBoxFocusRight"]:SetTexture(nil)
+--		_G[name.."EditBoxFocusMid"]:SetTexture(nil)
+--		f:Hide()
+--		self.frames[NUM_CHAT_WINDOWS+index]:Show()
+--		local font, s, m = f:GetFont()
+--		f:SetFont(Media:Fetch("font", self.db.profile.font), s, m)
+--	self:SetAttach(nil, self.db.profile.editX, self.db.profile.editY, self.db.profile.editW)
+--	end
+	
 	self:SetAttach(nil, self.db.profile.editX, self.db.profile.editY, self.db.profile.editW)
+	self:SecureHook("ChatEdit_DeactivateChat")
+	self:SecureHook("ChatEdit_SetLastActiveWindow")
 	
-	local f, s, m = ChatFrameEditBox:GetFont()
-	ChatFrameEditBox:SetFont(Media:Fetch("font", self.db.profile.font), s, m)
-	
+	self:SetBackdrop()
+	self:UpdateHeight()
 	if self.db.profile.colorByChannel then
 		self:RawHook("ChatEdit_UpdateHeader", "SetBorderByChannel", true)
+	end
+	self:SecureHook("FCF_Tab_OnClick")
+end
+function mod:FCF_Tab_OnClick(frame,button)
+	if self.db.profile.attach == "TOP" and GetCVar("chatStyle") ~= "classic" then
+		local chatFrame = _G["ChatFrame"..frame:GetID()];
+		ChatEdit_DeactivateChat(chatFrame.editBox)
 	end
 end
 
 function mod:OnDisable()
-	ChatFrameEditBox:SetAltArrowKeyMode(true)
-	local left, mid, right = select(6, ChatFrameEditBox:GetRegions())
-	left:Show()
-	mid:Show()
-	right:Show()
-	self.frame:Hide()
-	self:SetAttach("BOTTOM")
-	ChatFrameEditBox:SetFont(Media:Fetch("font", defaults.profile.font), 14)
+	for i = 1, NUM_CHAT_WINDOWS do
+		local f = _G["ChatFrame"..i.."EditBox"]
+		_G["ChatFrame"..i.."EditBoxLeft"]:Show()
+		_G["ChatFrame"..i.."EditBoxRight"]:Show()
+		_G["ChatFrame"..i.."EditBoxMid"]:Show()
+		f:SetAltArrowKeyMode(true)
+		f:EnableMouse(true)
+		f.frame:Hide()
+		self:SetAttach("BOTTOM")
+		--f:SetFont(Media:Fetch("font", defaults.profile.font), 14)
+	end
+--	for index,name in ipairs(self.TempChatFrames) do
+--		local f = _G[name.."EditBox"]
+--		_G[name.."EditBoxLeft"]:Show()
+--		_G[name.."EditBoxRight"]:Show()
+--		_G[name.."EditBoxMid"]:Show()
+--		f:SetAltArrowKeyMode(true)
+--		f:EnableMouse(true)
+--		f.frame:Hide()
+--	self:SetAttach("BOTTOM")
+--		f:SetFont(Media:Fetch("font", defaults.profile.font), 14)
+--	end
 end
 
+-- changed the Hide to SetAlpha(0), the new ChatSystem OnHide handlers go though some looping
+-- when in IM style and Classic style, cause heavy delays on the chat edit box.
+function mod:ChatEdit_SetLastActiveWindow(frame)
+	if self.db.profile.hideDialog and frame:IsShown() then
+		frame:SetAlpha(0)
+	else
+		frame:SetAlpha(1)
+	end
+	frame:EnableMouse(true)
+end
+function mod:ChatEdit_DeactivateChat(frame)
+	if self.db.profile.hideDialog and frame:IsShown() then
+		frame:SetAlpha(0)
+		frame:EnableMouse(false)
+	end
+end
 function mod:GetOptions()
 	return options
 end
 
 function mod:SetBackdrop()
-	self.frame:SetBackdrop({
+	for _, frame in ipairs(self.frames) do
+		frame:SetBackdrop({
 		bgFile = Media:Fetch("background", self.db.profile.background),
 		edgeFile = Media:Fetch("border", self.db.profile.border),
 		tile = true,
@@ -563,27 +722,31 @@ function mod:SetBackdrop()
 		insets = {left = self.db.profile.inset, right = self.db.profile.inset, top = self.db.profile.inset, bottom = self.db.profile.inset}
 	})
 	local c = self.db.profile.backgroundColor
-	self.frame:SetBackdropColor(c.r, c.g, c.b, c.a)
+		frame:SetBackdropColor(c.r, c.g, c.b, c.a)
 	
 	local c = self.db.profile.borderColor
-	self.frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
+		frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
+	end
 end
 
 function mod:SetBorderByChannel(...)
 	self.hooks.ChatEdit_UpdateHeader(...)
-	local attr = ChatFrameEditBox:GetAttribute("chatType")
+	for index, frame in ipairs(self.frames) do
+		local f = _G["ChatFrame"..index.."EditBox"]
+		local attr = f:GetAttribute("chatType")
 	if attr == "CHANNEL" then
-		local chan = ChatFrameEditBox:GetAttribute("channelTarget")
+			local chan = f:GetAttribute("channelTarget")
 		if chan == 0 then
 			local c = self.db.profile.borderColor
-			self.frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
+				frame:SetBackdropBorderColor(c.r, c.g, c.b, c.a)
 		else	
 			local r, g, b = GetMessageTypeColor("CHANNEL" .. chan)
-			self.frame:SetBackdropBorderColor(r, g, b, 1)
+				frame:SetBackdropBorderColor(r, g, b, 1)
 		end
 	else
 		local r, g, b = GetMessageTypeColor(attr)
-		self.frame:SetBackdropBorderColor(r, g, b, 1)
+			frame:SetBackdropBorderColor(r, g, b, 1)
+		end
 	end
 end
 
@@ -600,12 +763,12 @@ do
 	end
 
 	local cfHeight
-	local function constrainHeight()
-		ChatFrameEditBox:SetHeight(cfHeight)
+	local function constrainHeight(self)
+		self:GetParent():SetHeight(cfHeight)
 	end
 	
 	local function startDragging(self)
-		cfHeight = ChatFrameEditBox:GetHeight()
+		cfHeight = self:GetParent():GetHeight()
 		self:GetParent():StartSizing(not self.left and "TOPRIGHT" or "TOPLEFT")
 		self:SetScript("OnUpdate", constrainHeight)
 	end
@@ -616,59 +779,123 @@ do
 		self:SetScript("OnUpdate", nil)
 		mod.db.profile.editX = parent:GetLeft()
 		mod.db.profile.editY = parent:GetTop()
-		mod.db.profile.editW = parent:GetWidth()
+		mod.db.profile.editW = parent:GetWidth()	
 	end
 
 	function mod:SetAttach(val, x, y, w)
+		for i = 1, NUM_CHAT_WINDOWS do 
+			local frame = _G["ChatFrame" .. i .. "EditBox"]
 		local val = val or self.db.profile.attach
 		if not x and val == "FREE" then
-			x, y, w = ChatFrameEditBox:GetLeft(), ChatFrameEditBox:GetTop(), max(ChatFrameEditBox:GetWidth(), (ChatFrameEditBox:GetRight() or 0) - (ChatFrameEditBox:GetLeft() or 0))
+				if self.db.profile.editX and self.db.profile.editY then
+					x, y, w = self.db.profile.editX, self.db.profile.editY, self.db.profile.editW
+				else
+				x, y, w = frame:GetLeft(), frame:GetTop(), max(frame:GetWidth(), (frame:GetRight() or 0) - (frame:GetLeft() or 0))
+			end
 		end
 		if not w or w < 10 then w = 100 end
-		ChatFrameEditBox:ClearAllPoints()
+			frame:ClearAllPoints()
 		if val ~= "FREE" then
-			ChatFrameEditBox:SetMovable(false)
-			self.lDrag:EnableMouse(false)
-			self.rDrag:EnableMouse(false)
-			ChatFrameEditBox:SetScript("OnMouseDown", nil)
-			ChatFrameEditBox:SetScript("OnMouseUp", nil)
-			self.lDrag:EnableMouse(false)
-			self.rDrag:EnableMouse(false)			
-			self.lDrag:SetScript("OnMouseDown", nil)
-			self.rDrag:SetScript("OnMouseDown", nil)
-			self.lDrag:SetScript("OnMouseUp", nil)
-			self.rDrag:SetScript("OnMouseUp", nil)
+				frame:SetMovable(false)
+				frame.lDrag:EnableMouse(false)
+				frame.rDrag:EnableMouse(false)
+				frame:SetScript("OnMouseDown", nil)
+				frame:SetScript("OnMouseUp", nil)
+				frame.lDrag:EnableMouse(false)
+				frame.rDrag:EnableMouse(false)			
+				frame.lDrag:SetScript("OnMouseDown", nil)
+				frame.rDrag:SetScript("OnMouseDown", nil)
+				frame.lDrag:SetScript("OnMouseUp", nil)
+				frame.rDrag:SetScript("OnMouseUp", nil)
 		end
 		
 		if val == "TOP" then
-			ChatFrameEditBox:SetPoint("BOTTOMLEFT", ChatFrame1, "TOPLEFT")
-			ChatFrameEditBox:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT")
+				frame:SetPoint("BOTTOMLEFT", frame.chatFrame, "TOPLEFT", 0, 3)
+				frame:SetPoint("BOTTOMRIGHT", frame.chatFrame, "TOPRIGHT", 0, 3)
 		elseif val == "BOTTOM" then			
-			ChatFrameEditBox:SetPoint("TOPLEFT", ChatFrame1, "BOTTOMLEFT")
-			ChatFrameEditBox:SetPoint("TOPRIGHT", ChatFrame1, "BOTTOMRIGHT")
+				frame:SetPoint("TOPLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -8)
+				frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -8)
 		elseif val == "FREE" then
-			ChatFrameEditBox:EnableMouse(true)
-			ChatFrameEditBox:SetMovable(true)
-			ChatFrameEditBox:SetResizable(true)
-			ChatFrameEditBox:SetScript("OnMouseDown", startMoving)
-			ChatFrameEditBox:SetScript("OnMouseUp", stopMoving)
-			ChatFrameEditBox:SetWidth(w)
-			ChatFrameEditBox:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
-			ChatFrameEditBox:SetMinResize(40, 1)
+				frame:EnableMouse(true)
+				frame:SetMovable(true)
+				frame:SetResizable(true)
+				frame:SetScript("OnMouseDown", startMoving)
+				frame:SetScript("OnMouseUp", stopMoving)
+				frame:SetWidth(w)
+				frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+				frame:SetMinResize(40, 1)
 			
-			self.lDrag:EnableMouse(true)
-			self.rDrag:EnableMouse(true)
+				frame.lDrag:EnableMouse(true)
+				frame.rDrag:EnableMouse(true)
 			
-			self.lDrag:SetScript("OnMouseDown", startDragging)
-			self.rDrag:SetScript("OnMouseDown", startDragging)
+				frame.lDrag:SetScript("OnMouseDown", startDragging)
+				frame.rDrag:SetScript("OnMouseDown", startDragging)
 
-			self.lDrag:SetScript("OnMouseUp", stopDragging)
-			self.rDrag:SetScript("OnMouseUp", stopDragging)
-		elseif val == "LOCK" then
-			ChatFrameEditBox:SetWidth(self.db.profile.editW or w)
-			ChatFrameEditBox:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.editX or x, self.db.profile.editY or y)
+				frame.lDrag:SetScript("OnMouseUp", stopDragging)
+				frame.rDrag:SetScript("OnMouseUp", stopDragging)
+			elseif val == "LOCK" then
+				frame:SetWidth(self.db.profile.editW or w)
+				frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.editX or x, self.db.profile.editY or y)
+			end
 		end
+--		for index,name in ipairs(self.TempChatFrames) do
+--			local frame = _G[name .. "EditBox"]
+--			local val = val or self.db.profile.attach
+--			if not x and val == "FREE" then
+--				x, y, w = frame:GetLeft(), frame:GetTop(), max(frame:GetWidth(), (frame:GetRight() or 0) - (frame:GetLeft() or 0))
+--			end
+--			if not w or w < 10 then w = 100 end
+--			frame:ClearAllPoints()
+--			if val ~= "FREE" then
+--				frame:SetMovable(false)
+--				frame.lDrag:EnableMouse(false)
+--				frame.rDrag:EnableMouse(false)
+--				frame:SetScript("OnMouseDown", nil)
+--				frame:SetScript("OnMouseUp", nil)
+--				frame.lDrag:EnableMouse(false)
+--				frame.rDrag:EnableMouse(false)
+--				frame.lDrag:SetScript("OnMouseDown", nil)
+--				frame.rDrag:SetScript("OnMouseDown", nil)
+--				frame.lDrag:SetScript("OnMouseUp", nil)
+--				frame.rDrag:SetScript("OnMouseUp", nil)
+--			end
+--			if val == "TOP" then
+--				frame:SetPoint("BOTTOMLEFT", frame.chatFrame, "TOPLEFT", 0, 3)
+--				frame:SetPoint("BOTTOMRIGHT", frame.chatFrame, "TOPRIGHT", 0, 3)
+--			elseif val == "BOTTOM" then
+--				frame:SetPoint("TOPLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -8)
+--				frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -8)
+--			elseif val == "FREE" then
+--				frame:EnableMouse(true)
+--				frame:SetMovable(true)
+--				frame:SetResizable(true)
+--				frame:SetScript("OnMouseDown", startMoving)
+--				frame:SetScript("OnMouseUp", stopMoving)
+--				frame:SetWidth(w)
+--				frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y)
+--				frame:SetMinResize(40, 1)
+--				frame.lDrag:EnableMouse(true)
+--				frame.rDrag:EnableMouse(true)
+--				frame.lDrag:SetScript("OnMouseDown", startDragging)
+--				frame.rDrag:SetScript("OnMouseDown", startDragging)
+--				frame.lDrag:SetScript("OnMouseUp", stopDragging)
+--				frame.rDrag:SetScript("OnMouseUp", stopDragging)
+--		elseif val == "LOCK" then
+--				frame:SetWidth(self.db.profile.editW or w)
+--				frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.editX or x, self.db.profile.editY or y)
+--			end
+--		end
 	end
+end
+function mod:UpdateHeight()
+	for i = 1, NUM_CHAT_WINDOWS do
+		local ff = _G["ChatFrame"..i.."EditBox"]
+		ff:SetHeight(mod.db.profile.height)
+	end
+--	for index,name in ipairs(self.TempChatFrames) do
+--		local ff = _G[name.."EditBox"]
+--		ff:SetHeight(mod.db.profile.height)
+--	end
 end
 
   return

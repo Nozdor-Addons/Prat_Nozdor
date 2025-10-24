@@ -171,7 +171,7 @@ L:AddLocale("koKR",
 	alpha_desc = "모든 대화창의 메뉴와 화살표의 투명도를 설정합니다.",
 	alpha_name = "투명도 설정",
 	-- buttonframe_desc = "",
-	-- buttonframe_name = "",
+	buttonframe_name = "버튼 프레임 보이기",
 	ChannelNames = "채널이름",
 	chatmenu_desc = "대화 메뉴 보이기/숨기기 토글",
 	chatmenu_name = "대화 메뉴 보이기",
@@ -222,7 +222,7 @@ L:AddLocale("esMX",
 )
 L:AddLocale("ruRU",  
 {
-	alpha_desc = "Установить прозрачность меню чата, а также стрелок для всех окон чата.", -- Needs review
+	alpha_desc = "Установить прозрачность меню чата, а также стрелок для всех окон чата.",
 	alpha_name = "Прозрачность",
 	-- buttonframe_desc = "",
 	-- buttonframe_name = "",
@@ -234,7 +234,7 @@ L:AddLocale("ruRU",
 	["Original Buttons"] = "Обычные кнопки",
 	-- reflow_desc = "",
 	-- reflow_name = "",
-	reminder_desc = "Показать кнопку прокрутки, когда чат прокручен вверх, то-есть последнее сообщение не в нижней части окна чата.", -- Needs review
+	reminder_desc = "Показать кнопку прокрутки, когда чат прокручен вверх, то есть последнее сообщение не в нижней части окна чата.", -- Needs review
 	reminder_name = "Показать прокрутку вниз", -- Needs review
 	["Right, Inside Frame"] = "Справа, внутри рамки",
 	["Right, Outside Frame"] = "Справа, вне рамки",
@@ -242,8 +242,8 @@ L:AddLocale("ruRU",
 	["Sets position of chat menu and arrows for all chat windows."] = "Устанавливает позицию меню чата и стрелок для всех окон чата",
 	["Show Arrows"] = "Отображать стрелки",
 	["Show Chat%d Arrows"] = "Отображает стрелки чата %d",
-	["Toggle showing chat arrows for each chat window."] = "Вкл/Откл отображение стрелок для всех окон чата.", -- Needs review
-	["Toggles navigation arrows on and off."] = "Вкл/Откл отображение стрелок прокрутки чата", -- Needs review
+	["Toggle showing chat arrows for each chat window."] = "Вкл/Откл отображение стрелок для всех окон чата.",
+	["Toggles navigation arrows on and off."] = "Вкл/Откл отображение стрелок прокрутки чата",
 }
 
 )
@@ -390,7 +390,7 @@ Prat:SetModuleOptions(module.name, {
         	name = L["buttonframe_name"],
         	desc = L["buttonframe_desc"],    
             get = function(info) return module.db.profile.buttonframe end,
-            set = function(info, v) module.db.profile.buttonframe = v module:ButtonFrame(v) end, 
+            set = function(info, v) module.db.profile.buttonframe = v  module:ConfigureAllFrames() end, 
         },
         reminder = {
             type = "toggle",
@@ -430,6 +430,9 @@ Prat:SetModuleOptions(module.name, {
     }
 })
 
+local function hide(self)
+	self:Hide()
+end
 
 function module:OnSubValueChanged(info, val, b) 
     self:chatbutton(_G[val]:GetID(), b)
@@ -452,12 +455,15 @@ function module:OnModuleEnable()
     -- stub variables for frame handling
     self.frames = {}
     self.reminders = {}
-    for i = 1,NUM_CHAT_WINDOWS do
+    for i = 1,10 do
         table.insert(self.reminders, self:MakeReminder(i))
         self:chatbutton(i,self.db.profile.chatarrows["ChatFrame"..i])
+        self:ButtonFrame(i, self.db.profile.buttonframe)
+
     end
     self:ChatMenu(self.db.profile.chatmenu)
-    self:ButtonFrame(self.db.profile.buttonframe)
+        FriendsMicroButton:Hide()
+
     -- set OnUpdateInterval, if they are profiling, update less
 --    if GetCVar("scriptProfile") == "1" then
 --        self.OnUpdateInterval = 0.5
@@ -465,15 +471,16 @@ function module:OnModuleEnable()
 --        self.OnUpdateInterval = 0.05
 --    end
 
-    local smfhax = Prat.Addon:GetModule("SMFHax", true)
-    if self.db.profile.reflow and smfhax then
-        smfhax:Enable()
-    end
+--    local smfhax = Prat.Addon:GetModule("SMFHax", true)
+--    if self.db.profile.reflow and smfhax then
+--        smfhax:Enable()
+--    end
 
     self.OnUpdateInterval = 0.05
     self.lastupdate = 0
     -- hook functions
    self:SecureHook("ChatFrame_OnUpdate", "ChatFrame_OnUpdateHook")
+   self:SecureHook("FCF_SetTemporaryWindowType")
 end
 
 -- things to do when the module is disabled
@@ -492,19 +499,29 @@ end
     Core Functions
 ------------------------------------------------]]--
 
+function module:FCF_SetTemporaryWindowType(chatFrame, ...)
+    local i = chatFrame:GetID()
+    
+    self:chatbutton(i,self.db.profile.chatarrows[chatFrame:GetName()])
+    self:ButtonFrame(i, self.db.profile.buttonframe)    
+end
+
 function module:ConfigureAllFrames()
-    for i = 1,NUM_CHAT_WINDOWS do
-        self:chatbutton(i,self.db.profile.chatarrows["ChatFrame"..i])
+    for name,frame in pairs(Prat.Frames) do
+        local i = frame:GetID()
+        self:chatbutton(i,self.db.profile.chatarrows[name])
+        self:ButtonFrame(i, self.db.profile.buttonframe)
     end
     self:ChatMenu(self.db.profile.chatmenu)
-    self:ButtonFrame(self.db.profile.buttonframe)
+    
+    FriendsMicroButton:Hide()   
 end
 
 function module:ChatFrame_OnUpdateHook(this, elapsed)
   if not this:IsVisible() and not this:IsShown() then return end
   self.lastupdate = self.lastupdate + elapsed
 
-  while (self.lastupdate > self.OnUpdateInterval) do
+  while (self.lastupdate > self.OnUpdateInterval) do 
     self:ChatFrame_OnUpdate(this, elapsed)
     self.lastupdate = self.lastupdate - self.OnUpdateInterval;
   end
@@ -550,15 +567,23 @@ function module:ChatFrame_OnUpdate(this, elapsed)
     end
 end
 
-function module:ButtonFrame(visible)
+function module:ButtonFrame(id, visible)
     if not Prat.BN_CHAT then return end
     
+    local f = _G["ChatFrame"..id.."ButtonFrame"]
+    local cf = _G["ChatFrame"..id]
+    
     if visible then
-        ChatFrame1ButtonFrame:Show()
-        FriendsMicroButton:Show()
+        f:SetScript("OnShow", nil)
+        f:Show()
+        f:SetWidth(29)
+--        cf:AddMessage("Show Button Frame")
     else
-        ChatFrame1ButtonFrame:Hide()
-        FriendsMicroButton:Hide()
+        f:SetScript("OnShow", hide)    
+        f:Hide()
+
+        f:SetWidth(0.1)
+--        cf:AddMessage("Hide Button Frame")
     end
 end
 -- manipulate chatframe menu button
@@ -571,7 +596,7 @@ function module:ChatMenu(visible)
         f = self.frames[1]
     end   
     f.cfScrl = f.cfScrl or {}
-    f.cfScrl.up = getglobal("ChatFrame1UpButton")
+    f.cfScrl.up = getglobal("ChatFrame1ButtonFrameUpButton")
     -- chatmenu position:
     -- position chatmenu under the UpButton for chatframe1 if button position is set to "RIGHTINSIDE"
     -- otherwise position chatmenu above the UpButton for chatframe1
@@ -587,11 +612,15 @@ function module:ChatMenu(visible)
     -- chatmenu visibility
     -- show buttons based on show settings
     if visible then
+        ChatFrameMenuButton:SetScript("OnShow", nil)
         ChatFrameMenuButton:Show()
     else
         ChatFrameMenuButton:Hide()
+        ChatFrameMenuButton:SetScript("OnShow", hide)        
     end
 end
+
+
 
 -- manipulate chatframe scrolling and reminder buttons
 function module:chatbutton(id,visible)
@@ -609,10 +638,30 @@ function module:chatbutton(id,visible)
         f.cfScrl.up = f.cfScrl.up or getglobal("ChatFrame"..id.."ButtonFrameUpButton")
         f.cfScrl.down = f.cfScrl.down or getglobal("ChatFrame"..id.."ButtonFrameDownButton")
         f.cfScrl.bottom = f.cfScrl.bottom or getglobal("ChatFrame"..id.."ButtonFrameBottomButton")
+        f.cfScrl.min = f.cfScrl.min or getglobal("ChatFrame"..id.."ButtonFrameMinimizeButton")
+        
         if f.cfScrl.up then
         f.cfScrl.up:SetParent(f.cf)        
         f.cfScrl.down:SetParent(f.cf)
         f.cfScrl.bottom:SetParent(f.cf)
+        f.cfScrl.min:SetParent(_G[f.cf:GetName().."Tab"])
+
+        f.cfScrl.min:SetScript("OnShow", 
+                            function(self)
+                                if f.cf.isDocked then
+                                    self:Hide()
+                                end
+                            end )
+                            
+        f.cfScrl.min:SetScript("OnClick", 
+                            function(self) 
+								FCF_MinimizeFrame(f.cf, strupper(f.cf.buttonSide))
+							end )
+        
+        f.cfScrl.up:SetScript("OnClick", function() PlaySound("igChatBottom"); f.cf:ScrollUp() end)
+        f.cfScrl.down:SetScript("OnClick", function() PlaySound("igChatBottom"); f.cf:ScrollDown() end)
+        f.cfScrl.bottom:SetScript("OnClick", function() PlaySound("igChatBottom"); f.cf:ScrollToBottom() end)
+        
         end
     else
     f.cfScrl.up = f.cfScrl.up or getglobal("ChatFrame"..id.."UpButton")
@@ -703,7 +752,7 @@ function module:MakeReminder(id)
     b:SetPoint("LEFT", cf, "RIGHT", -32, 0)
     b:SetPoint("TOP", cf, "BOTTOM", 0, 28)
     b:SetPoint("BOTTOM", cf, "BOTTOM", 0, 0)
-    b:SetScript("OnClick", function() PlaySound("igChatBottom"); this:GetParent():ScrollToBottom() end)
+    b:SetScript("OnClick", function() PlaySound("igChatBottom"); cf:ScrollToBottom() end)
     -- hide the button by default
     b:Hide()
     -- add a flash texture for the reminder button

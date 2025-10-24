@@ -73,8 +73,8 @@ L:AddLocale("enUS",
 )
 L:AddLocale("frFR",  
 {
-	-- ["Chat window event name options."] = "",
-	-- EventNames = "",
+	["Chat window event name options."] = "Options des évènements de la fenêtre de chat",
+	EventNames = "Nom des évènements",
 	Show = "Montrer",
 	show_desc = "Activer l'affichage des noms d'évènements dans chaque fenêtre",
 	["Show events on chatframes"] = "Montrer les évènements dans le cadre du chat",

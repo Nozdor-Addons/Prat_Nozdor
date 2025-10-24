@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -306,11 +306,11 @@ local module = Prat:NewModule(PRAT_MODULE, "AceHook-3.0")
 
 Prat:SetModuleDefaults(module.name, {
 	profile = {
-        on = false,
+        on = true,
         displaymode = { },
         disableflash = false,
-        notactivealpha = 0.5,
-        activealpha = 1,
+        notactivealpha = 0,
+        activealpha = 0,
 		preventdrag = false,
 	}
 } )
@@ -349,7 +349,7 @@ Prat:SetModuleOptions(module.name, {
                 desc = L["Sets alpha of chat tab for active chat frame."],
                 type = "range",
                 order = 130,
-                min = 0.1,
+                min = 0.0,
                 max = 1,
                 step = 0.1,
             },
@@ -358,7 +358,7 @@ Prat:SetModuleOptions(module.name, {
                 desc = L["Sets alpha of chat tab for not active chat frame."],
                 type = "range",
                 order = 140,
-                min = 0.1,
+                min = 0.0,
                 max = 1,
                 step = 0.1,
             },
@@ -374,11 +374,15 @@ Prat:SetModuleOptions(module.name, {
 
 -- things to do when the module is enabled
 function module:OnModuleEnable()
-    self:SecureHook("FCF_FlashTab")
+    self:SecureHook("FCF_StartAlertFlash")
 
     self:HookedMode(true)
 
     self:UpdateAllTabs()
+    
+    
+
+
 end
 
 -- things to do when the module is enabled
@@ -448,12 +452,25 @@ function module:Prat_PostAddMessage(info, message, frame, event, text, r, g, b, 
 end
 
 function module:UpdateAllTabs()
+    CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = self.db.profile.activealpha;
+    CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = self.db.profile.notactivealpha; 
+    
     for k,v in pairs(Prat.Frames) do 
         if FCF_IsValidChatFrame(v) then
+            
             local chatTab = _G[k.."Tab"]
             chatTab:Show()
             chatTab:Hide()
             FloatingChatFrame_Update(v:GetID()) 
+            
+            chatTab.mouseOverAlpha = CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA;            
+	        chatTab.noMouseAlpha = CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA;
+            
+            -- Prevent an error in FloatingChatFrame FCF_FadeOutChatFrame() (blizz bug)
+            chatTab:SetAlpha(chatTab:GetAlpha() or 0)
+            v:SetAlpha(v:GetAlpha() or 0)
+
+            FCF_FadeOutChatFrame(v)
         end
     end
 end
@@ -493,19 +510,9 @@ end
 
 
 
-function module:FCF_FlashTab(this)
-    dbg("FCF_FlashTab", this)
-
-    local i = this:GetName()
-    local p = self.db.profile
-    
-    if p.disableflash or p.displaymode[i] == false then 
-        dbg(Prat.CURRENT_MSG)
-       -- _G[i.."TabText"]:SetTextColor(1,0,0)        
---        print ChatFrame1TabText:SetTextColor(1,0,0)  
-        UIFrameFlashStop(getglobal(i.."TabFlash"))
-   
-        
+function module:FCF_StartAlertFlash(this)
+    if self.db.profile.disableflash  then 
+        FCF_StopAlertFlash(this)        
     end
 end
 

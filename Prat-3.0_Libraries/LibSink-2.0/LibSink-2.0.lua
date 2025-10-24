@@ -1,6 +1,6 @@
 ﻿--[[
 Name: Sink-2.0
-Revision: $Rev: 67 $
+Revision: $Rev: 71 $
 Author(s): Rabbit (rabbit.magtheridon@gmail.com), Antiarc (cheal@gmail.com)
 Website: http://rabbit.nihilum.eu
 Documentation: http://wiki.wowace.com/index.php/Sink-2.0
@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -- Sink-2.0
 
 local SINK20 = "LibSink-2.0"
-local SINK20_MINOR = 90000 + tonumber(("$Revision: 67 $"):match("(%d+)"))
+local SINK20_MINOR = 90000 + tonumber(("$Revision: 71 $"):match("(%d+)"))
 
 local sink = LibStub:NewLibrary(SINK20, SINK20_MINOR)
 if not sink then return end
@@ -75,6 +75,7 @@ local L_STICKY = "Sticky"
 local L_STICKY_DESC = "Set messages from this addon to appear as sticky.\n\nOnly available for some output sinks."
 local L_NONE = "None"
 local L_NONE_DESC = "Hide all messages from this addon."
+local L_NOTINCHANNEL = " (You tried sending this to the channel %s, but it appears you are not there.)"
 
 local l = GetLocale()
 if l == "koKR" then
@@ -263,7 +264,7 @@ local function blizzard(addon, text, r, g, b, font, size, outline, sticky, _, ic
 	end
 end
 
-local channelMapping = {
+sink.channelMapping = sink.channelMapping or {
 	[SAY] = "SAY",
 	[PARTY] = "PARTY",
 	[BATTLEGROUND] = "BATTLEGROUND",
@@ -272,13 +273,49 @@ local channelMapping = {
 	[YELL] = "YELL",
 	[RAID] = "RAID",
 	[RAID_WARNING] = "RAID_WARNING",
+	[GROUP] = "GROUP",
 }
+sink.frame = sink.frame or CreateFrame("Frame")
+sink.frame:RegisterEvent("CHANNEL_UI_UPDATE")
+sink.frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+do
+	local newChannels = {}
+	local function loop(...)
+		wipe(newChannels)
+		for i = 1, select("#", ...), 2 do
+			local id, name = select(i, ...)
+			newChannels[name] = true
+		end
+		for k, v in pairs(sink.channelMapping) do
+			if v == "CHANNEL" and not newChannels[k] then
+				sink.channelMapping[k] = nil
+			end
+		end
+		for k in pairs(newChannels) do sink.channelMapping[k] = "CHANNEL" end
+	end
+	local function rescanChannels() loop(GetChannelList()) end
+	sink.frame:SetScript("OnEvent", rescanChannels)
+	rescanChannels()
+end
 
 local function channel(addon, text)
 	-- Sanitize the text, remove all color codes.
 	text = text:gsub("(|c%x%x%x%x%x%x%x%x)", ""):gsub("(|r)", "")
-	local loc = sink.storageForAddon[addon] and sink.storageForAddon[addon].sink20ScrollArea or SAY
-	SendChatMessage(text, channelMapping[loc] or SAY)
+	local loc = sink.storageForAddon[addon] and sink.storageForAddon[addon].sink20ScrollArea or "SAY"
+	local chan = sink.channelMapping[loc]
+	if chan == "GROUP" then
+		chan = select(2, IsInInstance()) == "pvp" and "BATTLEGROUND" or (UnitInRaid("player") and "RAID" or "PARTY")
+		if chan == "PARTY" and GetNumPartyMembers() == 0 then chan = "SAY" end
+	elseif chan == "CHANNEL" then
+		local id, name = GetChannelName(loc)
+		if name then
+			SendChatMessage(text, "CHANNEL", nil, id)
+		else
+			print(text .. L_NOTINCHANNEL)
+		end
+		return
+	end
+	SendChatMessage(text, chan or "SAY")
 end
 
 local function chat(addon, text, r, g, b, _, _, _, _, _, icon)
@@ -342,7 +379,7 @@ local function getPrioritizedSink()
 			return sink.handlers[currentHandler]
 		end
 	end
-	for i, v in ipairs(handlerPriority) do
+	for i, v in next, handlerPriority do
 		local check = customHandlersEnabled[v]
 		if check and check() then
 			currentHandler = v
@@ -376,6 +413,8 @@ function sink:Pour(textOrAddon, ...)
 	local t = type(textOrAddon)
 	if t == "string" then
 		pour(self, textOrAddon, ...)
+	elseif t == "number" then
+		pour(self, tostring(textOrAddon), ...)
 	elseif t == "table" then
 		pour(textOrAddon, ...)
 	else
@@ -402,9 +441,9 @@ do
 		return not SHOW_COMBAT_TEXT or tostring(SHOW_COMBAT_TEXT) == "0"
 	end
 
-	local channelAreas = { SAY, YELL, PARTY, GUILD_CHAT, OFFICER_CHAT, RAID, RAID_WARNING, BATTLEGROUND }
 	local sctFrames = {"Incoming", "Outgoing", "Messages"}
 	local msbtFrames = nil
+	local tmp = {}
 	local function getScrollAreasForAddon(addon)
 		if type(addon) ~= "string" then return nil end
 		if addon == "Parrot" then
@@ -427,16 +466,20 @@ do
 			end
 		elseif addon == "BCF" then
 			if bcfDB then
-				local bcfAreas = { }
+				local bcfAreas = {}
 				for i = 1, #bcfDB["scrollAreas"] do
-					table.insert(bcfAreas, bcfDB["scrollAreas"][i]["name"])
+					bcfAreas[#bcfAreas + 1] = bcfDB["scrollAreas"][i]["name"]
 				end
 				return bcfAreas
 			end
 		elseif addon == "SCT" then
 			return sctFrames
 		elseif addon == "Channel" then
-			return channelAreas
+			wipe(tmp)
+			for k in pairs(sink.channelMapping) do
+				tmp[#tmp + 1] = k
+			end
+			return tmp
 		elseif sink.registeredScrollAreaFunctions[addon] then
 			return sink.registeredScrollAreaFunctions[addon]()
 		end
@@ -557,12 +600,12 @@ do
 					else
 						if sink.storageForAddon[addon].sink20OutputSink == key then
 							local sa = getScrollAreasForAddon(key)
-                            if sa then
-                                for k,v in ipairs(sa) do
-                                    sa[k] = nil
-                                    sa[v] = v
-                                end
-                            end
+							if sa then
+								for k,v in ipairs(sa) do
+									sa[k] = nil
+									sa[v] = v
+								end
+							end
 							options["Ace3"][addon].args.ScrollArea.values = sa or emptyTable
 							options["Ace3"][addon].args.ScrollArea.disabled = not sa
 							options["Ace3"][addon].args.Sticky.disabled = not sink.stickyAddons[key]
@@ -579,12 +622,12 @@ do
 						sink.storageForAddon[addon].sink20Sticky = v
 					elseif v then
 						local sa = getScrollAreasForAddon(key)
-                        if sa then
-                            for k,v in ipairs(sa) do
-                                sa[k] = nil
-                                sa[v] = v
-                            end
-                        end
+						if sa then
+							for k,v in ipairs(sa) do
+								sa[k] = nil
+								sa[v] = v
+							end
+						end
 						options["Ace3"][addon].args.ScrollArea.values = sa or emptyTable
 						options["Ace3"][addon].args.ScrollArea.disabled = not sa
 						options["Ace3"][addon].args.Sticky.disabled = not sink.stickyAddons[key]
@@ -736,3 +779,4 @@ end
 for addon in pairs(sink.embeds) do
 	sink:Embed(addon)
 end
+

@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 --
 -- Prat - A framework for World of Warcraft chat mods
 --
@@ -510,8 +510,27 @@ function module:OnModuleEnable()
         self:RawHook(v, "AddMessage", true)
     end
 
+    self:SecureHook("FCF_SetTemporaryWindowType")
+    
+    self:RawHook("ChatChannelDropDown_PopOutChat", true)
+    
   	self.secondsDifference = 0
 	self.lastMinute = select(2, GetGameTime())
+end
+
+local hookedFrames = {}
+
+function module:FCF_SetTemporaryWindowType(chatFrame, ...)
+    if not hookedFrames[chatFrame:GetName()] then
+        hookedFrames[chatFrame:GetName()] = true
+        self:RawHook(chatFrame, "AddMessage", true)
+    end
+end
+
+function module:ChatChannelDropDown_PopOutChat(...)
+    Prat.loading = true
+    self.hooks["ChatChannelDropDown_PopOutChat"](...)
+    Prat.loading = nil
 end
 
 --[[------------------------------------------------
