@@ -21,12 +21,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create ZIP from current commit
+      - name: Create ZIP from current commit (exclude .github)
         id: make_zip
         shell: bash
         run: |
-          ZIP_NAME="repo-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}.zip"
-          git archive --format=zip -o "$ZIP_NAME" HEAD
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"         # owner/repo -> repo
+          BRANCH="${GITHUB_REF_NAME}"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          ZIP_NAME="${REPO_NAME}-${BRANCH}-${SHORT_SHA}.zip"
+
+          git archive --format=zip -o "$ZIP_NAME" HEAD -- . ':(exclude).github'
+
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
           size=$(stat -c%s "$ZIP_NAME")
